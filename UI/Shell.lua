@@ -1,0 +1,209 @@
+-- Azeroth Familiar - UI/Shell.lua
+-- The main window's navigation and page host. Each feature registers a page; a page is
+-- built the first time it is opened, inside pcall, so one broken page can't take the
+-- window (or the other pages) down with it. Only the page on screen is refreshed, on a
+-- slow timer that stops when the window is hidden.
+
+local ADDON, AA = ...
+local Sh = {}
+AA.Shell = Sh
+local W = AA.W
+
+Sh.defs = {}   -- id -> definition
+Sh.order = {}  -- sorted list of definitions
+local state = {} -- id -> { frame, layout, built, broken }
+local nav, host, navButtons, modeText, current
+local NAV_W, NAV_COMPACT = 128, 36
+local flashToken = 0
+
+-- def: { id, title, icon, order, subtitle, build(L, page), refresh(L), interval, frame, onShow }
+function Sh.Register(def)
+  Sh.defs[def.id] = def
+  Sh.order[#Sh.order + 1] = def
+  table.sort(Sh.order, function(a, b) return (a.order or 50) < (b.order or 50) end)
+end
+
+local function settings() return AA.db.settings end
+
+local function pageState(def)
+  local st = state[def.id]
+  if st then return st end
+  st = {}
+  state[def.id] = st
+  if def.frame then
+    st.frame = def.frame
+    st.frame:SetAllPoints(host)
+    st.built = true
+    return st
+  end
+  local sf, child = W.Scroll(host)
+  sf:SetPoint("TOPLEFT", 4, -4)
+  sf:SetPoint("BOTTOMRIGHT", -4, 4)
+  st.frame = sf
+  st.layout = W.Layout(child)
+  local ok, err = pcall(def.build, st.layout, child)
+  if ok then
+    st.built = true
+    st.layout:Finish()
+  else
+    st.broken = tostring(err)
+    AA.pageErrors = AA.pageErrors or {}
+    AA.pageErrors[def.id] = st.broken
+    local fs = W.Text(child, AA.C.warn .. "This page hit an error and was switched off:|r\n" .. st.broken)
+    fs:SetPoint("TOPLEFT", 12, -12)
+    fs:SetPoint("RIGHT", child, "RIGHT", -12, 0)
+  end
+  return st
+end
+
+local function refreshPage(def)
+  local st = state[def.id]
+  if not st or not st.built or st.broken then return end
+  if st.layout then
+    local ok, err = pcall(function()
+      st.layout:Refresh()
+      if def.refresh then def.refresh(st.layout) end
+    end)
+    if not ok then
+      -- Keep the page; it is tried again on the next refresh. The text is kept for /aa diag.
+      AA.pageErrors = AA.pageErrors or {}
+      AA.pageErrors[def.id] = tostring(err)
+    end
+  end
+end
+
+function Sh.Current() return current end
+
+function Sh.Refresh()
+  local def = current and Sh.defs[current]
+  if def then refreshPage(def) end
+end
+
+local function paintNav()
+  for id, b in pairs(navButtons or {}) do
+    local on = (id == current)
+    b.sel:SetAlpha(on and 1 or 0)
+    b.text:SetText((on and "|cffffffff" or W.GOLD) .. Sh.defs[id].title .. "|r")
+  end
+end
+
+function Sh.Show(id)
+  if not host then return end
+  local def = Sh.defs[id] or Sh.defs.overview or Sh.order[1]
+  if not def then return end
+  for otherId, st in pairs(state) do
+    if otherId ~= def.id and st.frame then st.frame:Hide() end
+  end
+  local st = pageState(def)
+  current = def.id
+  settings().lastPage = def.id
+  st.frame:Show()
+  if modeText then modeText:SetText(def.subtitle or "") end
+  paintNav()
+  refreshPage(def)
+  if def.onShow then pcall(def.onShow) end
+end
+
+-- Page to open first: the user's choice in Interface settings.
+function Sh.StartPage()
+  local s = settings()
+  local id = s.startPage
+  if id == "last" then id = s.lastPage end
+  if not Sh.defs[id] then id = "overview" end
+  return id
+end
+
+-- Short feedback in the title bar after a setting changes.
+function Sh.Flash(msg, good)
+  if not modeText then return end
+  flashToken = flashToken + 1
+  local mine = flashToken
+  modeText:SetText((good == false and AA.C.warn or AA.C.good) .. tostring(msg) .. "|r")
+  if C_Timer and C_Timer.After then
+    C_Timer.After(8, function()
+      if mine == flashToken and modeText and current and Sh.defs[current] then
+        modeText:SetText(Sh.defs[current].subtitle or "")
+      end
+    end)
+  end
+end
+
+function Sh.ApplyLayout()
+  if not nav then return end
+  local compact = settings().compactNav and true or false
+  local w = compact and NAV_COMPACT or NAV_W
+  nav:SetWidth(w)
+  host:ClearAllPoints()
+  host:SetPoint("TOPLEFT", nav, "TOPRIGHT", 1, 0)
+  host:SetPoint("BOTTOMRIGHT", -1, 1)
+  for _, b in pairs(navButtons) do
+    b:SetWidth(w - 2)
+    if compact then b.text:Hide() else b.text:Show() end
+  end
+end
+
+-- Called once by UI.lua when the window is created.
+function Sh.Attach(frame, mode)
+  modeText = mode
+  nav = CreateFrame("Frame", nil, frame)
+  nav:SetPoint("TOPLEFT", 1, -26)
+  nav:SetPoint("BOTTOMLEFT", 1, 1)
+  nav:SetWidth(NAV_W)
+  W.Bg(nav, 0.08, 0.08, 0.10, 1)
+  local edge = nav:CreateTexture(nil, "BORDER")
+  edge:SetColorTexture(0.45, 0.36, 0.18, 0.8)
+  edge:SetWidth(1)
+  edge:SetPoint("TOPRIGHT"); edge:SetPoint("BOTTOMRIGHT")
+
+  host = CreateFrame("Frame", nil, frame)
+  navButtons = {}
+  local y = -6
+  for _, def in ipairs(Sh.order) do
+    local b = CreateFrame("Button", nil, nav)
+    b:SetSize(NAV_W - 2, 28)
+    b:SetPoint("TOPLEFT", 1, y)
+    y = y - 30
+    local sel = b:CreateTexture(nil, "BACKGROUND")
+    sel:SetAllPoints()
+    sel:SetColorTexture(0.45, 0.10, 0.06, 0.85)
+    sel:SetAlpha(0)
+    b.sel = sel
+    local hl = b:CreateTexture(nil, "HIGHLIGHT")
+    hl:SetAllPoints()
+    hl:SetColorTexture(1, 0.82, 0, 0.12)
+    local icon = def.icon
+    if type(icon) == "function" then     -- e.g. the Character page's race-matched head
+      local ok, path = pcall(icon)
+      icon = ok and path or nil
+    end
+    local ic = W.Icon(b, icon, 22)
+    ic:SetPoint("LEFT", 6, 0)
+    b.text = W.Text(b, def.title, "GameFontNormalSmall")
+    b.text:SetPoint("LEFT", 34, 0)
+    local id = def.id
+    b:SetScript("OnClick", function() Sh.Show(id) end)
+    b:SetScript("OnEnter", function(self)
+      GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+      GameTooltip:AddLine(def.title)
+      if def.subtitle then GameTooltip:AddLine(def.subtitle, 1, 1, 1, true) end
+      GameTooltip:Show()
+    end)
+    b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    navButtons[id] = b
+  end
+  Sh.ApplyLayout()
+
+  -- One slow timer for whichever page is on screen. Stops when the window is hidden.
+  local acc = 0
+  host:SetScript("OnUpdate", function(_, elapsed)
+    acc = acc + (tonumber(elapsed) or 0)
+    local def = current and Sh.defs[current]
+    if def and def.interval and acc >= def.interval then
+      acc = 0
+      refreshPage(def)
+    elseif acc > 60 then
+      acc = 0
+    end
+  end)
+  return host
+end

@@ -1,0 +1,44 @@
+## Interface: 16001
+## Title: Azeroth Familiar
+## Notes: Everyday toolkit for WoW Forever: overview dashboard, graphics presets, performance, character, bags, saved places, gameplay options, and an optional assistant for item and quest questions.
+## Author: Trinchet
+## Version: 0.8.0
+## SavedVariables: AzerothAssistantDB
+## SavedVariablesPerCharacter: AzerothAssistantCharDB
+## Category: Quests & Leveling
+## IconTexture: Interface\AddOns\AzerothAssistant\Media\Logo
+## AddonCompartmentFunc: AzerothAssistant_OnAddonCompartmentClick
+## OptionalDeps: Questie, QuestieDB
+
+# Interface 16001 = WoW Forever 1.60.1 as reported by the community (beta and launch).
+# Run /aa diag in game and update this number if the game says the addon is out of date.
+
+Core.lua
+CompanionInbox.lua
+Integrations\Wowhead.lua
+Integrations\Questie.lua
+Links.lua
+Context.lua
+Search.lua
+Compare.lua
+Quests.lua
+Export.lua
+Companion.lua
+Assistant.lua
+Tweaks.lua
+Modules\Stats.lua
+Modules\Reminders.lua
+Modules\BagHint.lua
+UI\Widgets.lua
+UI\Shell.lua
+UI.lua
+Modules\Overview.lua
+Modules\Graphics.lua
+Modules\Performance.lua
+Modules\Character.lua
+Modules\Inventory.lua
+Modules\World.lua
+Modules\Gameplay.lua
+Modules\Interface.lua
+ChatTab.lua
+Minimap.lua
