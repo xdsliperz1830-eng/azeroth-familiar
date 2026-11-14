@@ -187,9 +187,10 @@ local function remember(name)
 end
 
 -- Learned upper limits ---------------------------------------------------------
--- The maxima in T.SETTINGS are guesses. When the game refuses a higher value and keeps a
--- lower one, that lower value is this client's real top for the slider. It is saved, and
--- forgotten when the game build changes (a patch may raise it).
+-- The maxima in T.SETTINGS are guesses. When you RAISE a slider and the game keeps a lower
+-- value, that value is this client's real top for the slider. It is saved, and forgotten
+-- when the game build changes (a patch may raise it). Lowering a slider never teaches a
+-- limit, and a value you can see in the game is never above the limit (self-correcting).
 local RANGE_BY_CVAR = {}
 for _, s in ipairs(T.SETTINGS) do
   if s.kind == "range" then RANGE_BY_CVAR[s.cvar] = s end
@@ -205,22 +206,38 @@ local function limits()
   AA.db.tweaks = type(AA.db.tweaks) == "table" and AA.db.tweaks or {}
   local tw = AA.db.tweaks
   local b = clientBuild()
-  if type(tw.limits) ~= "table" or tw.limits.build ~= b then tw.limits = { build = b } end
-  return tw.limits
+  -- "ceilings" replaces the first version's "limits", which could learn a wrong top while
+  -- you clicked a slider down quickly; those values are dropped.
+  tw.limits = nil
+  if type(tw.ceilings) ~= "table" or tw.ceilings.build ~= b then tw.ceilings = { build = b } end
+  return tw.ceilings
+end
+
+-- Forget every learned top (used by the Default preset and by restoring your settings).
+function T.ForgetLimits()
+  if AA.db and type(AA.db.tweaks) == "table" then AA.db.tweaks.ceilings = nil end
 end
 
 -- The highest value a range setting can really take on this client.
 function T.Max(s)
   local learned = tonumber(limits()[s.cvar])
-  if learned and learned >= s.min and learned < s.max then return learned end
+  if learned and learned >= s.min and learned < s.max then
+    local cur = tonumber(getCVar(s.cvar))
+    if cur and cur > learned then        -- the game shows more than we "learned": we were wrong
+      limits()[s.cvar] = nil
+      return s.max
+    end
+    return learned
+  end
   return s.max
 end
 
--- Called after asking for `asked` and reading back `now`.
-local function learn(name, asked, now)
+-- Called after raising a setting from `before` to `asked` and reading back `now`.
+-- Only an increase the game didn't keep teaches a top.
+local function learn(name, before, asked, now)
   local s = RANGE_BY_CVAR[name]
-  local a, n = tonumber(asked), tonumber(now)
-  if s and a and n and n < a and n >= s.min then
+  local b, a, n = tonumber(before), tonumber(asked), tonumber(now)
+  if s and b and a and n and a > b and n < a and n >= b then
     limits()[name] = n
   end
 end
@@ -237,12 +254,15 @@ end
 local function apply(name, value)
   if value == nil then return false, getCVar(name) end
   remember(name)
+  local before = getCVar(name)
   setCVar(name, value)
   local now = getCVar(name)
   local ok = same(now, value)
-  if not ok then learn(name, value, now) end
+  if not ok then learn(name, before, value, now) end
   return ok, now
 end
+
+local changes = {}   -- [cvar] = number of the latest change, so a stale re-check does nothing
 
 -- Lookup ---------------------------------------------------------------------
 function T.Find(id)
@@ -345,6 +365,9 @@ function T.SetValue(s, v)
   end
   local top = T.Max(s)
   if v < s.min then v = s.min elseif v > top then v = top end
+  local before = tonumber(getCVar(s.cvar))
+  changes[s.cvar] = (changes[s.cvar] or 0) + 1
+  local seq = changes[s.cvar]
   local ok, now = apply(s.cvar, v)
   local n = tonumber(now)
   if not ok then
@@ -353,14 +376,16 @@ function T.SetValue(s, v)
     end
     return false, s.label .. ": the game kept " .. (n and T.Format(s, n) or tostring(now)) .. "."
   end
-  -- Some settings are accepted at first and lowered by the game a moment later.
-  -- Look again shortly; if it dropped, learn the real top and redraw the page.
-  if C_Timer and C_Timer.After and v > s.min then
+  -- Some settings may be accepted at first and lowered by the game a moment later.
+  -- After a raise, look again shortly; if it dropped (and you haven't clicked this slider
+  -- since), learn the real top and redraw the page.
+  if C_Timer and C_Timer.After and before and v > before then
     local asked = v
     C_Timer.After(1, function()
+      if changes[s.cvar] ~= seq then return end      -- you changed it again since: not the game
       local later = tonumber(getCVar(s.cvar))
-      if later and later < asked then
-        learn(s.cvar, asked, later)
+      if later and later < asked and later >= before then
+        learn(s.cvar, before, asked, later)
         if AA.Shell and AA.Shell.Refresh then pcall(AA.Shell.Refresh) end
         if AA.Shell and AA.Shell.Flash then
           pcall(AA.Shell.Flash, s.label .. ": " .. T.Format(s, later) .. " is the highest this game allows.", false)
@@ -398,6 +423,7 @@ function T.ApplyPreset(id)
     end
   end
   AA.db.tweaks.preset = id
+  if id == "default" then T.ForgetLimits() end
   local msg = p.label .. ": " .. applied .. " settings applied"
   if #adjusted > 0 then msg = msg .. "; the game kept its own value for " .. table.concat(adjusted, ", ") end
   if missing > 0 then msg = msg .. "; " .. missing .. " not in this client" end
@@ -429,6 +455,7 @@ end
 -- Puts back every value this addon ever changed (graphics and gameplay). Returns ok, message.
 function T.RestoreOriginals()
   if inCombat() then return false, COMBAT_MSG end
+  T.ForgetLimits()
   local keep = saved()
   local done, failed = 0, {}
   -- grass variables last, for the same reason as PRESET_ORDER
