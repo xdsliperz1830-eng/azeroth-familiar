@@ -22,7 +22,9 @@ O.CARDS = {
       return (sub and (sub .. ", ") or "") .. (zone or "Unknown") .. (xy and ("  (" .. xy .. ")") or "")
     end },
   { id = "vitals", title = "Health and mana", icon = I .. "INV_Potion_54", value = function()
-      local text, shown = St.VitalsText("player", "Health %s    Mana %s", "Health %s", true)
+      local name, color = St.PowerLook("player")
+      local health = St.HEALTH_COLOR .. "Health %s|r"
+      local text, shown = St.VitalsText("player", health .. "    " .. color .. name .. " %s|r", health, true)
       if shown then return text end
       return W.GREY .. St.VitalsHidden() .. "|r"
     end },

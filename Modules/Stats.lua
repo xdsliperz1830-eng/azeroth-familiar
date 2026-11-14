@@ -241,6 +241,19 @@ function St.VitalsText(unit, both, one, current)
   return nil, false
 end
 
+-- Name and text colour of a unit's power type: mana blue, rage red, energy yellow.
+local POWER_LOOK = {
+  MANA = { "Mana", "|cff4fa3ff" }, RAGE = { "Rage", "|cffff4040" }, ENERGY = { "Energy", "|cffffff00" },
+  FOCUS = { "Focus", "|cffff8040" }, RUNIC_POWER = { "Runic power", "|cff00d1ff" },
+}
+St.HEALTH_COLOR = "|cff1eff00"
+function St.PowerLook(unit)
+  local ok, _, token = g("UnitPowerType", unit or "player")
+  local look = ok and POWER_LOOK[AA.Str(token) or ""]
+  if look then return look[1], look[2] end
+  return "Mana", POWER_LOOK.MANA[2]
+end
+
 -- What to show when health and power can't be displayed.
 function St.VitalsHidden()
   local combat = type(InCombatLockdown) == "function" and InCombatLockdown()
