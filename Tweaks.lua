@@ -353,6 +353,21 @@ function T.SetValue(s, v)
     end
     return false, s.label .. ": the game kept " .. (n and T.Format(s, n) or tostring(now)) .. "."
   end
+  -- Some settings are accepted at first and lowered by the game a moment later.
+  -- Look again shortly; if it dropped, learn the real top and redraw the page.
+  if C_Timer and C_Timer.After and v > s.min then
+    local asked = v
+    C_Timer.After(1, function()
+      local later = tonumber(getCVar(s.cvar))
+      if later and later < asked then
+        learn(s.cvar, asked, later)
+        if AA.Shell and AA.Shell.Refresh then pcall(AA.Shell.Refresh) end
+        if AA.Shell and AA.Shell.Flash then
+          pcall(AA.Shell.Flash, s.label .. ": " .. T.Format(s, later) .. " is the highest this game allows.", false)
+        end
+      end
+    end)
+  end
   return true, s.label .. ": " .. T.Format(s, n)
 end
 
