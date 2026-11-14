@@ -11,7 +11,7 @@
 | Graphics | Five presets (Default, Low, Balanced, High, Immersive), the three enhancements (sharper image, more grass, stronger weather) and the game's quality sliders. Remembers your earlier values; one button restores them. |
 | Performance | Frame rate, average, latency, session length, plain advice, optional on-screen readout, addon memory on request. |
 | Character | Experience and rested bonus, session experience and gold, durability by item, target summary. |
-| Bags | Free slots, gold, grey items with vendor value, bag search. When you loot with full bags, the stack worth the least at a vendor is marked in the bags (default frames and Bagnon) with a pulsing glow, red tint and a "DROP" label, and is named in chat; closed bags open for it and close with the loot window. Profession and class tools (skinning knife, mining pick, fishing pole...) are never picked. Never sells or deletes anything. |
+| Bags | Free slots, gold, grey items with vendor value, bag search. When you loot with full bags, the stack worth the least (vendor price, or Auctionator's auction price when that is higher) is marked in the bags (default frames and Bagnon) with a pulsing glow, red tint and a "DROP" label, and is named in chat; closed bags open for it and close with the loot window. Profession and class tools (skinning knife, mining pick, fishing pole...) are never picked. Never sells or deletes anything. |
 | World | Zone and coordinates, saved places, map pin (when the client supports it), copy box. |
 | Gameplay | The game's own convenience options: auto-loot, instant quest text, nameplates, camera distance, UI scale and more. |
 | Interface | Window size, opacity, compact navigation, start page, Overview cards, chat reminders, resets. |

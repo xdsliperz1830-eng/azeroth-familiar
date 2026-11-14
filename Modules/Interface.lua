@@ -74,7 +74,7 @@ local function build(L, p)
     function() return S().remind.cheapest end,
     function(x) S().remind.cheapest = x; if AA.BagHint then AA.BagHint.Update() end end,
     "Looting with full bags: mark what to drop",
-    "When you open a loot window with no bag slots left, the stack worth the least at a vendor is marked DROP in your bags (default bags or Bagnon) and named in chat. Closed bags open for it and close again with the loot window. Items with no vendor price and profession tools are never picked. Nothing is sold or deleted for you.")
+    "When you open a loot window with no bag slots left, the stack worth the least is marked DROP (vendor price, or the Auctionator auction price when higher) in your bags (default bags or Bagnon) and named in chat. Closed bags open for it and close again with the loot window. Items with no vendor price and profession tools are never picked. Nothing is sold or deleted for you.")
   remind("vendor", "At a vendor: grey items and repair cost", "One line when you open a vendor with grey items to sell or repairs to make. Nothing is sold or repaired for you.")
   remind("levelup", "Level-up summary", "One line with your session length and experience per hour when you level.")
 

@@ -1,6 +1,6 @@
 -- Azeroth Familiar - Modules/BagHint.lua
 -- While a loot window is open and every bag slot is full, finds the item stack worth the
--- least at a vendor and makes its bag slot hard to miss (pulsing glow, red tint and a
+-- least (vendor price, or the auction price from Auctionator when that is higher) and makes its bag slot hard to miss (pulsing glow, red tint and a
 -- bouncing "DROP" label), adds a line to its tooltip and prints one chat line, so you know
 -- what to drop to pick up the loot. Opens the bags for that if they were closed, and
 -- closes them again with the loot window.
@@ -61,7 +61,20 @@ local bagnonButtons = setmetatable({}, { __mode = "k" })
 
 local function enabled() return AA.db and AA.db.settings.remind.cheapest end
 
--- Cheapest sellable stack in the bags, or nil.
+-- Auction price of one item, in copper, from Auctionator's public API; nil without data.
+-- Soulbound items can't be auctioned, so they never get one.
+local function auctionPrice(link, bound)
+  if bound or type(link) ~= "string" then return nil end
+  local api = type(Auctionator) == "table" and type(Auctionator.API) == "table" and Auctionator.API.v1
+  local fn = type(api) == "table" and api.GetAuctionPriceByItemLink
+  if type(fn) ~= "function" then return nil end
+  local ok, price = pcall(fn, "Azeroth Familiar", link)
+  price = ok and AA.Num(price) or nil
+  return (price and price > 0) and price or nil
+end
+
+-- Cheapest stack in the bags, or nil. A stack is worth its vendor price or its auction
+-- price, whichever is higher, times the stack size.
 function H.FindCheapest()
   local getInfo = AA.Api("C_Container", "GetContainerItemInfo")
   local questInfo = AA.Api("C_Container", "GetContainerItemQuestInfo")
@@ -79,10 +92,15 @@ function H.FindCheapest()
         skip = okQ and type(q) == "table" and (q.isQuestItem or q.questID) and true or false
       end
       if sell > 0 and not skip then
-        local value = sell * (e.count or 1)
+        local count = e.count or 1
+        local vendor = sell * count
+        local ah = auctionPrice(e.link, info.isBound)
+        local auction = ah and ah * count or nil
+        local value = math.max(vendor, auction or 0)
         local quality = AA.Num(info.quality) or 1
         if not best or value < best.value or (value == best.value and quality < best.quality) then
-          best = { bag = e.bag, slot = e.slot, link = e.link, name = e.name, count = e.count or 1, value = value, quality = quality }
+          best = { bag = e.bag, slot = e.slot, link = e.link, name = e.name, count = count, value = value,
+                   vendor = vendor, auction = auction, quality = quality }
         end
       end
     end
@@ -323,12 +341,21 @@ function H.Update()
     announced = true
     AA:Print(AA.C.warn .. "Bags full.|r To make room for the loot, drop " ..
       (target.count > 1 and (target.count .. "x ") or "") .. (target.link or target.name or "an item") ..
-      " (worth " .. AA.Stats.MoneyText(target.value) .. "). It is marked DROP in your bags.")
+      " (" .. H.WorthText(target) .. "). It is marked DROP in your bags.")
   end
   applySoon()
 end
 
 function H.Target() return target end
+
+-- "worth 15c at a vendor" / "worth 1s 20c at auction (15c at a vendor)", for the whole stack.
+function H.WorthText(t)
+  local M = AA.Stats.MoneyText
+  if t.auction and t.auction > t.vendor then
+    return "worth " .. M(t.auction) .. " at auction (" .. M(t.vendor) .. " at a vendor)"
+  end
+  return "worth " .. M(t.vendor or t.value) .. " at a vendor"
+end
 
 AA:On("BAG_UPDATE_DELAYED", function() if lootOpen then H.Update() end end)
 AA:On("LOOT_OPENED", function()
@@ -396,6 +423,7 @@ local function hookAll()
     hooksecurefunc(GameTooltip, "SetBagItem", function(tt, bag, slot)
       if target and bag == target.bag and slot == target.slot then
         tt:AddLine("Azeroth Familiar: cheapest item - drop it to make room for loot", 1, 0.5, 0.3)
+        tt:AddLine(H.WorthText(target), 1, 0.82, 0.6)
         tt:Show()
       end
     end)

@@ -29,7 +29,7 @@ Auto-loot, loot window at the mouse, instant quest text, auto self-cast, floatin
 
 ## Bags: know what to drop
 - Free slots, grey items and what they're worth at a vendor, and a bag search
-- **Looting with full bags?** The cheapest item in your bags gets a pulsing red **DROP** label, its tooltip says to drop it, and the bags open so you can see it. Works with the default bags and **Bagnon**.
+- **Looting with full bags?** The cheapest stack in your bags gets a pulsing red **DROP** label. Cheapest means vendor price, or the auction price when **Auctionator** has one and it's higher, so items that sell well at the auction house aren't picked, its tooltip says to drop it, and the bags open so you can see it. Works with the default bags and **Bagnon**.
 - It never picks quest items, your hearthstone, or profession tools like your skinning knife, mining pick or fishing pole
 
 ## Assistant: ask in plain English
@@ -67,6 +67,7 @@ You can also click the minimap button or use the AddOn compartment menu.
 ## Works with
 - **Questie** (optional): powers the vendor, drop, NPC and quest-location answers
 - **Bagnon** (optional): the DROP mark shows in Bagnon's bags
+- **Auctionator** (optional): auction prices count when choosing what to drop
 
 Made for **World of Warcraft: Forever**. Source code: https://github.com/xdsliperz1830-eng/azeroth-familiar
 Feedback and bug reports are welcome; BugSack error text helps a lot.
