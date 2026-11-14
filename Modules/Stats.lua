@@ -212,6 +212,36 @@ function St.Power(unit)
   if c and m and m > 0 then return c, m end
 end
 
+-- Health and power as display text. Returns text, true; or nil, false when even that fails.
+-- On WoW Forever these numbers are "secret values": addons may show them but not read,
+-- compare or do maths on them. So when they aren't plain numbers they go straight into one
+-- string.format call, whose result is only ever handed to a FontString (never tested).
+-- both: format with four %s (health cur/max, power cur/max); one: format with two %s.
+function St.VitalsText(unit, both, one)
+  unit = unit or "player"
+  local hc, hm = St.Health(unit)
+  if hc then
+    local pc, pm = St.Power(unit)
+    if pc then return string.format(both, hc, hm, pc, pm), true end
+    return string.format(one, hc, hm), true
+  end
+  local h, hx = AA.Api("UnitHealth"), AA.Api("UnitHealthMax")
+  local p, px = AA.Api("UnitPower"), AA.Api("UnitPowerMax")
+  if not (h and hx) then return nil, false end
+  local ok, text = pcall(function()
+    if p and px then return string.format(both, h(unit), hx(unit), p(unit), px(unit)) end
+    return string.format(one, h(unit), hx(unit))
+  end)
+  if ok then return text, true end
+  return nil, false
+end
+
+-- What to show when health and power can't be displayed.
+function St.VitalsHidden()
+  local combat = type(InCombatLockdown) == "function" and InCombatLockdown()
+  return combat and "hidden in combat" or "hidden by the game"
+end
+
 -- Returns cur, max, rested (rested may be nil). nil at max level.
 function St.XP()
   local ok, c = g("UnitXP", "player")

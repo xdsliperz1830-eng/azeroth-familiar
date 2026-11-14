@@ -22,10 +22,9 @@ O.CARDS = {
       return (sub and (sub .. ", ") or "") .. (zone or "Unknown") .. (xy and ("  (" .. xy .. ")") or "")
     end },
   { id = "vitals", title = "Health and mana", icon = I .. "INV_Potion_54", value = function()
-      local hc, hm = St.Health()
-      local pc, pm = St.Power()
-      if not hc then return W.GREY .. "hidden in combat|r" end
-      return "Health " .. pct(hc, hm) .. (pc and ("   Power " .. pct(pc, pm)) or "")
+      local text, shown = St.VitalsText("player", "HP %s / %s   MP %s / %s", "HP %s / %s")
+      if shown then return text end
+      return W.GREY .. St.VitalsHidden() .. "|r"
     end },
   { id = "gold", title = "Gold", icon = I .. "INV_Misc_Coin_02", value = function()
       local s = St.SessionSummary()
@@ -93,8 +92,9 @@ local function refresh()
     if AA.db.settings.dash[c.def.id] == false then
       c.frame:Hide()
     else
+      -- text may be a secret string (health/mana): hand it over, never test or compare it
       local ok, text = pcall(c.def.value)
-      c.frame.value:SetText(ok and text or "n/a")
+      if ok then c.frame.value:SetText(text) else c.frame.value:SetText("n/a") end
       if type(c.def.icon) == "function" and c.frame.icon then
         local okI, path = pcall(c.def.icon)
         if okI and path and path ~= c.iconPath then

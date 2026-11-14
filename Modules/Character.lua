@@ -42,9 +42,8 @@ end
 local function refresh()
   local u = St.Unit("player")
   v.who:SetText(string.format("%s, level %s %s %s", u.name or "?", tostring(u.level or "?"), u.race or "", u.class or ""))
-  local hc, hm = St.Health()
-  local pc, pm = St.Power()
-  v.vitals:SetText(hc and (hc .. " / " .. hm .. (pc and ("     " .. pc .. " / " .. pm) or "")) or W.GREY .. "hidden in combat|r")
+  local vitals, shown = St.VitalsText("player", "%s / %s     %s / %s", "%s / %s")
+  if shown then v.vitals:SetText(vitals) else v.vitals:SetText(W.GREY .. St.VitalsHidden() .. "|r") end
   local cur, max, rested = St.XP()
   if cur then
     v.xp:SetText(string.format("%d / %d  (%d%%), %d to go", cur, max, cur / max * 100, max - cur))
