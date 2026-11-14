@@ -5,7 +5,7 @@
 local ADDON, AA = ...
 AzerothAssistant = AA -- global handle for /dump debugging only
 
-AA.VERSION = "0.8.0"
+AA.VERSION = "0.8.1"
 AA.NAME = "Azeroth Familiar"
 AA.MAX_HISTORY_LINES = 400
 AA.MAX_IMPORT_CHARS = 4000
