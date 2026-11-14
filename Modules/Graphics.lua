@@ -65,7 +65,7 @@ function AA.SettingRows(L, p, list, out, showStatus)
       local st = W.Stepper(p, {
         get = function() return T.Value(s) end,
         set = function(v) done(T.SetValue(s, v)) end,
-        min = s.min, max = s.max, step = s.step or 1,
+        min = s.min, max = function() return T.Max(s) end, step = s.step or 1,
         fmt = function(v) return T.Format(s, v) end,
       })
       st:SetPoint("TOPLEFT", 250, y)

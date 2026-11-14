@@ -124,13 +124,19 @@ function W.Input(parent, maxLetters)
 end
 
 -- [-] value [+]. opts: get() -> number or nil, set(v), min, max, step, fmt(v) -> text
+-- max may be a function, for limits learned while the game runs.
 function W.Stepper(parent, opts)
   local f = CreateFrame("Frame", nil, parent)
   f:SetSize(150, 22)
   local value = W.Text(f, "", "GameFontHighlight")
+  local function top()
+    if type(opts.max) == "function" then return tonumber(opts.max()) end
+    return opts.max
+  end
   local function clamp(v)
+    local hi = top()
     if opts.min and v < opts.min then v = opts.min end
-    if opts.max and v > opts.max then v = opts.max end
+    if hi and v > hi then v = hi end
     return v
   end
   local function bump(dir)
@@ -157,7 +163,9 @@ function W.Stepper(parent, opts)
       minus:Disable(); plus:Disable()
     else
       value:SetText(opts.fmt and opts.fmt(n) or tostring(n))
-      minus:Enable(); plus:Enable()
+      local hi, eps = top(), (opts.step or 1) / 2
+      if opts.min and n <= opts.min + eps * 0.01 then minus:Disable() else minus:Enable() end
+      if hi and n >= hi - eps * 0.01 then plus:Disable() else plus:Enable() end
     end
   end
   return f

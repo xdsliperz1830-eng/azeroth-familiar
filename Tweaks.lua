@@ -186,13 +186,62 @@ local function remember(name)
   if keep[name] == nil then keep[name] = getCVar(name) end
 end
 
+-- Learned upper limits ---------------------------------------------------------
+-- The maxima in T.SETTINGS are guesses. When the game refuses a higher value and keeps a
+-- lower one, that lower value is this client's real top for the slider. It is saved, and
+-- forgotten when the game build changes (a patch may raise it).
+local RANGE_BY_CVAR = {}
+for _, s in ipairs(T.SETTINGS) do
+  if s.kind == "range" then RANGE_BY_CVAR[s.cvar] = s end
+end
+
+local function clientBuild()
+  if type(GetBuildInfo) ~= "function" then return "?" end
+  local ok, version, build = pcall(GetBuildInfo)
+  return ok and (tostring(version) .. "." .. tostring(build)) or "?"
+end
+
+local function limits()
+  AA.db.tweaks = type(AA.db.tweaks) == "table" and AA.db.tweaks or {}
+  local tw = AA.db.tweaks
+  local b = clientBuild()
+  if type(tw.limits) ~= "table" or tw.limits.build ~= b then tw.limits = { build = b } end
+  return tw.limits
+end
+
+-- The highest value a range setting can really take on this client.
+function T.Max(s)
+  local learned = tonumber(limits()[s.cvar])
+  if learned and learned >= s.min and learned < s.max then return learned end
+  return s.max
+end
+
+-- Called after asking for `asked` and reading back `now`.
+local function learn(name, asked, now)
+  local s = RANGE_BY_CVAR[name]
+  local a, n = tonumber(asked), tonumber(now)
+  if s and a and n and n < a and n >= s.min then
+    limits()[name] = n
+  end
+end
+
+-- A preset's target, never above the learned top of its slider.
+local function capped(name, value)
+  local s = RANGE_BY_CVAR[name]
+  local v = tonumber(value)
+  if s and v and v > T.Max(s) then return T.Max(s) end
+  return value
+end
+
 -- Sets one variable and reads it back. Returns ok, valueNow.
 local function apply(name, value)
   if value == nil then return false, getCVar(name) end
   remember(name)
   setCVar(name, value)
   local now = getCVar(name)
-  return same(now, value), now
+  local ok = same(now, value)
+  if not ok then learn(name, value, now) end
+  return ok, now
 end
 
 -- Lookup ---------------------------------------------------------------------
@@ -236,7 +285,7 @@ end
 
 -- How a range value is shown: quality sliders read "8 of 10", others as the raw number.
 function T.Format(s, v)
-  if s.level then return string.format("%d of %d", v - s.min + 1, s.max - s.min + 1) end
+  if s.level then return string.format("%d of %d", v - s.min + 1, T.Max(s) - s.min + 1) end
   return string.format("%.2f", v)
 end
 
@@ -253,7 +302,7 @@ end
 function T.Commands(s)
   local out = {}
   if s.kind == "range" then
-    out[1] = "/console " .. s.cvar .. " <" .. s.min .. " to " .. s.max .. ">"
+    out[1] = "/console " .. s.cvar .. " <" .. s.min .. " to " .. T.Max(s) .. ">"
   else
     for _, cv in ipairs(s.cvars) do out[#out + 1] = "/console " .. cv[1] .. " " .. cv[2] end
   end
@@ -294,10 +343,14 @@ function T.SetValue(s, v)
   if not T.Available(s) then
     return false, "This client doesn't have that setting (" .. s.cvar .. ")."
   end
-  if v < s.min then v = s.min elseif v > s.max then v = s.max end
+  local top = T.Max(s)
+  if v < s.min then v = s.min elseif v > top then v = top end
   local ok, now = apply(s.cvar, v)
   local n = tonumber(now)
   if not ok then
+    if n and n < v and T.Max(s) == n then
+      return false, s.label .. ": " .. T.Format(s, n) .. " is the highest this game allows."
+    end
     return false, s.label .. ": the game kept " .. (n and T.Format(s, n) or tostring(now)) .. "."
   end
   return true, s.label .. ": " .. T.Format(s, n)
@@ -309,7 +362,7 @@ end
 
 local function presetTarget(p, name)
   if p.id == "default" then return getDefault(name) end
-  return p.values[name]
+  return capped(name, p.values[name])
 end
 
 -- Returns ok, message. Only touches the variables listed for that preset.
