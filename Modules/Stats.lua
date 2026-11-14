@@ -217,20 +217,25 @@ end
 -- compare or do maths on them. So when they aren't plain numbers they go straight into one
 -- string.format call, whose result is only ever handed to a FontString (never tested).
 -- both: format with four %s (health cur/max, power cur/max); one: format with two %s.
-function St.VitalsText(unit, both, one)
+-- With current = true, the formats get only the current values (two %s / one %s).
+function St.VitalsText(unit, both, one, current)
   unit = unit or "player"
+  local function fmt(f, a, b, c, d)
+    if current then return string.format(f, a, c) end
+    return string.format(f, a, b, c, d)
+  end
   local hc, hm = St.Health(unit)
   if hc then
     local pc, pm = St.Power(unit)
-    if pc then return string.format(both, hc, hm, pc, pm), true end
-    return string.format(one, hc, hm), true
+    if pc then return fmt(both, hc, hm, pc, pm), true end
+    return fmt(one, hc, hm), true
   end
   local h, hx = AA.Api("UnitHealth"), AA.Api("UnitHealthMax")
   local p, px = AA.Api("UnitPower"), AA.Api("UnitPowerMax")
   if not (h and hx) then return nil, false end
   local ok, text = pcall(function()
-    if p and px then return string.format(both, h(unit), hx(unit), p(unit), px(unit)) end
-    return string.format(one, h(unit), hx(unit))
+    if p and px then return fmt(both, h(unit), hx(unit), p(unit), px(unit)) end
+    return fmt(one, h(unit), hx(unit))
   end)
   if ok then return text, true end
   return nil, false
