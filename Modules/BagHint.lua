@@ -395,10 +395,11 @@ function H.Report()
   pcall(H.Apply)
   for _ in pairs(bagnonButtons) do nBagnon = nBagnon + 1 end
   for _, o in pairs(overlays) do if o:IsVisible() then nLit = nLit + 1 end end
-  local t = target or (free == 0 and H.FindCheapest()) or nil
-  AA:Print(string.format("Bag check: %s free of %s; option %s; loot window %s; cheapest %s; Bagnon %s (%d slots seen, hooks %s); marks shown %d.",
+  local t = target or H.FindCheapest()   -- also when bags aren't full, to test the pick
+  AA:Print(string.format("Bag check: %s free of %s; option %s; loot window %s; cheapest %s; Auctionator %s; Bagnon %s (%d slots seen, hooks %s); marks shown %d.",
     tostring(free), tostring(total), enabled() and "on" or "off", lootOpen and "open" or "closed (marks show only while looting)",
-    t and string.format("%s in bag %s slot %s (%s)", t.link or t.name or "?", tostring(t.bag), tostring(t.slot), AA.Stats.MoneyText(t.value)) or "none",
+    t and string.format("%s in bag %s slot %s, %s", t.link or t.name or "?", tostring(t.bag), tostring(t.slot), H.WorthText(t)) or "none",
+    (type(Auctionator) == "table" and type(Auctionator.API) == "table") and "found" or "not found",
     bagnonNS() and "found" or "not found", nBagnon, bagnonHooked and "on" or "off", nLit))
 end
 
