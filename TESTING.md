@@ -1,5 +1,17 @@
 # In-game test checklist
 
+## v0.9.0: Crates page (Crate Scout merged)
+Fully exit and restart WoW (new files in the .toc). The standalone Crate Scout addon is retired: remove or disable it. Nothing below has been run in the real game yet.
+- [ ] **Crates** appears in the navigation with a crate icon; `/fam crates` and `/cratescout` open it. No red error note.
+- [ ] The footer says "Recipes verified 30/30" (or fewer while item data loads). `/fam crates verify` prints the same.
+- [ ] My Crates lists carried crates; All Crates lists all 30; Buy & Fill shows Empty crate / Materials / Total cash required when expanded.
+- [ ] With the AH closed, Scan is greyed out and the note says "AH closed". Opening the window never starts a scan.
+- [ ] At the AH, Scan shows progress; Cancel stops it; closing the AH removes the green highlights.
+- [ ] Hover Apprentice Curiosities after a scan: the cheapest line (e.g. "- 4 Greater Magic Essence") turns green, the others keep their color, and four short "Azeroth Familiar · Crates" lines are added once. Hover another item and back: no stale green, no duplicate lines.
+- [ ] Interface page: untick "Crate tooltips: highlight the cheapest bundle"; crate tooltips lose the Crates lines.
+- [ ] Rows fit at the default window size; long names end in "..." and show in full on hover.
+
+
 ## v0.7.0: toolkit (new window, eight pages)
 Fully exit and restart WoW (new files in the .toc). Nothing below has been run in the real game yet.
 

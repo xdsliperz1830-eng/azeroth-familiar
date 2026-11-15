@@ -12,12 +12,13 @@
 | Performance | Frame rate, average, latency, session length, plain advice, optional on-screen readout, addon memory on request. |
 | Character | Experience and rested bonus, session experience and gold, durability by item, target summary. |
 | Bags | Free slots, gold, grey items with vendor value, bag search. When you loot with full bags, the stack worth the least (vendor price, or Auctionator's auction price when that is higher) is marked in the bags (default frames and Bagnon) with a pulsing glow, red tint and a "DROP" label, and is named in chat; closed bags open for it and close with the loot window. Profession and class tools (skinning knife, mining pick, fishing pole...) are never picked. Never sells or deletes anything. |
+| Crates | Waylaid Crate planner (formerly the Crate Scout addon). My Crates, All Crates and Buy & Fill compare the cash needed to fill one crate with each valid bundle, using owned materials and a manual Auction House scan, and to buy an empty crate and fill it. Crate tooltips get a short summary and the cheapest bundle line turns green (amber for cached estimates). See `docs/CRATES.md`. Never buys or opens anything. |
 | World | Zone and coordinates, saved places, map pin (when the client supports it), copy box. |
 | Gameplay | The game's own convenience options: auto-loot, instant quest text, nameplates, camera distance, UI scale and more. |
 | Interface | Window size, opacity, compact navigation, start page, Overview cards, chat reminders, resets. |
 | Assistant | The original item/quest/bag assistant, with the optional desktop companion. |
 
-Commands: `/fam` (open), `/fam graphics`, `/fam perf`, `/fam character`, `/fam bags`, `/fam world`, `/fam gameplay`, `/fam interface`, `/fam assistant`, `/fam pin <name>`, `/fam fps`, `/fam diag`, `/fam help`. `/familiar` and the old `/aa` work the same way.
+Commands: `/fam` (open), `/fam graphics`, `/fam perf`, `/fam character`, `/fam bags`, `/fam crates` (also `/fam crates verify`, `/fam crates cancel`, and the old `/cratescout`), `/fam world`, `/fam gameplay`, `/fam interface`, `/fam assistant`, `/fam pin <name>`, `/fam fps`, `/fam diag`, `/fam help`. `/familiar` and the old `/aa` work the same way.
 
 ## What it will not do
 No selling, buying, repairing, looting, targeting, casting or message sending. Game settings change only when you click, never in combat, and each change is read back from the game. Health and mana are hidden from addons during combat on this client, so there are no low-health reminders.
@@ -26,7 +27,7 @@ No selling, buying, repairing, looting, targeting, casting or message sending. G
 Tested in a simulated client only. In the real game, only the earlier assistant features and the three graphics enhancements have been seen working. Game setting names were checked against this install's `Config.wtf`; the upper limits of the quality sliders and all Gameplay options are checked at run time (missing ones are greyed out). See `TESTING.md`.
 
 ## Files
-`Core.lua` (namespace, saved data, events, slash commands, diagnostics), `Tweaks.lua` (game-settings engine), `Modules/Stats.lua` (read-only facts and session tracking), `Modules/Reminders.lua`, `Modules/BagHint.lua` (what-to-drop mark when looting with full bags), `UI/Widgets.lua` (shared controls), `UI/Shell.lua` (navigation and page host), `UI.lua` (window and Assistant page), one file per page in `Modules/`, and the assistant files (`Assistant.lua`, `Search.lua`, `Compare.lua`, `Quests.lua`, `Context.lua`, `Links.lua`, `Export.lua`, `Companion.lua`, `ChatTab.lua`, `Integrations/`).
+`Core.lua` (namespace, saved data, events, slash commands, diagnostics), `Tweaks.lua` (game-settings engine), `Modules/Stats.lua` (read-only facts and session tracking), `Modules/Reminders.lua`, `Modules/BagHint.lua` (what-to-drop mark when looting with full bags), `Crates/` (crate recipes, tooltip validation, AH scanner, cost engine and tooltip highlight; page in `Modules/Crates.lua`), `UI/Widgets.lua` (shared controls), `UI/Shell.lua` (navigation and page host), `UI.lua` (window and Assistant page), one file per page in `Modules/`, and the assistant files (`Assistant.lua`, `Search.lua`, `Compare.lua`, `Quests.lua`, `Context.lua`, `Links.lua`, `Export.lua`, `Companion.lua`, `ChatTab.lua`, `Integrations/`).
 
 ---
 
@@ -224,6 +225,10 @@ AzerothAssistant/
   Export.lua               Ask AI packet + validated import
   Assistant.lua            question router
   UI.lua                   window, copy/import dialog, settings
+  Crates/                  Waylaid Crate engine (catalog, validation, AH scan, costs, tooltip)
+  Modules/Crates.lua       Crates page, events, /fam crates
+  docs/CRATES.md           Crates rules, data sources, compatibility evidence
+  tests/                   fixture tests for Crates (python tests/run.py)
   TESTING.md               in-game test checklist
 ```
 

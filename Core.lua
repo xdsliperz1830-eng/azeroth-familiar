@@ -5,7 +5,7 @@
 local ADDON, AA = ...
 AzerothAssistant = AA -- global handle for /dump debugging only
 
-AA.VERSION = "0.8.1"
+AA.VERSION = "0.9.0"
 AA.NAME = "Azeroth Familiar"
 AA.MAX_HISTORY_LINES = 400
 AA.MAX_IMPORT_CHARS = 4000
@@ -52,6 +52,8 @@ local DEFAULTS = {
     remind = { durability = true, bags = true, cheapest = true, vendor = true, levelup = true },
     perfDisplay = false,    -- small on-screen FPS readout
     perfLatency = true,     -- include world latency in it
+    -- Crates page (v0.9.0, formerly the Crate Scout addon)
+    crates = { countOwned = false, tooltip = true },
   },
   locations = {},           -- saved places (World page), account-wide
   tweaks = { saved = {} },  -- game settings changed by the addon, with the values they had before
@@ -295,8 +297,9 @@ end
 
 local HELP = {
   "/fam  - open or close the window (/aa and /familiar work too)",
-  "/fam overview, graphics, perf, character, bags, world, gameplay, interface, assistant  - open that page",
+  "/fam overview, graphics, perf, character, bags, crates, world, gameplay, interface, assistant  - open that page",
   "/fam <question>  - ask the assistant, e.g. /fam search medium leather",
+  "/fam crates  - Waylaid Crate planner; /fam crates verify | cancel | inspect <itemID>",
   "/fam pin <name>  - save where you're standing (World page)",
   "/fam fps  - show or hide the on-screen frame rate",
   "/fam diag  - check which game features this client has (saved for troubleshooting)",
@@ -313,6 +316,7 @@ local PAGES = {
   overview = "overview", home = "overview", graphics = "graphics", extras = "graphics",
   perf = "performance", performance = "performance", character = "character", char = "character",
   bags = "inventory", inventory = "inventory", world = "world", map = "world",
+  crates = "crates", crate = "crates",
   gameplay = "gameplay", interface = "interface", options = "interface", config = "interface",
   assistant = "assistant", ask = "assistant",
 }
@@ -336,6 +340,8 @@ function AA:Slash(msg)
     if AA.ChatTab then AA.ChatTab.Recreate() end
   elseif PAGES[cmd] then
     if AA.UI then AA.UI.ShowPage(PAGES[cmd]) end
+  elseif cmd:find("^crates? ") and AA.Crates and AA.Crates.UI then
+    AA.Crates.UI.Slash(msg:match("^%S+%s+(.*)$"))
   elseif cmd == "fps" then
     AA.db.settings.perfDisplay = not AA.db.settings.perfDisplay
     if AA.Performance then AA.Performance.RefreshMini() end
@@ -429,6 +435,12 @@ function AA:RunDiagnostics(verbose)
     chatTab = AA.ChatTab and (AA.ChatTab.frame and AA.ChatTab.frame:GetName() or ("none: " .. tostring(AA.ChatTab.error))) or nil,
     chatTabHooks = AA.ChatTab and AA.ChatTab.hooked or nil,
   }
+  if AA.Crates and AA.Crates.Inventory then
+    local okC, n, t = pcall(AA.Crates.Inventory.Coverage, AA.Crates.Inventory)
+    local okS, scan, why = pcall(AA.Crates.Scan.Capabilities, AA.Crates.Scan)
+    d.crates = { verified = okC and n or nil, recipes = okC and t or nil, scanReady = okS and scan or false, scanReason = okS and why or nil,
+      tooltipHook = AA.Crates.Tooltip.installed or false }
+  end
   if AA.Questie then
     local db, why = AA.Questie.DB()
     d.questieDB = db and ("contract " .. AA.Questie.CONTRACT .. " OK" .. (db.contractVersion and (", provider contract " .. tostring(db.contractVersion)) or "")) or why

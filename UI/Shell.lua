@@ -30,6 +30,16 @@ local function pageState(def)
   if st then return st end
   st = {}
   state[def.id] = st
+  -- makeFrame(host): a page that draws its own frame (the Crates table), built the first
+  -- time it is opened. If it fails, the page shows the usual error note instead.
+  local ok, err = true, nil
+  if not def.frame and def.makeFrame then
+    local made
+    ok, made = pcall(def.makeFrame, host)
+    if ok and made then def.frame = made
+    elseif ok then ok, err = false, "page frame missing"
+    else err = made end
+  end
   if def.frame then
     st.frame = def.frame
     st.frame:SetAllPoints(host)
@@ -41,7 +51,7 @@ local function pageState(def)
   sf:SetPoint("BOTTOMRIGHT", -4, 4)
   st.frame = sf
   st.layout = W.Layout(child)
-  local ok, err = pcall(def.build, st.layout, child)
+  if ok then ok, err = pcall(def.build, st.layout, child) end
   if ok then
     st.built = true
     st.layout:Finish()
@@ -59,9 +69,9 @@ end
 local function refreshPage(def)
   local st = state[def.id]
   if not st or not st.built or st.broken then return end
-  if st.layout then
+  if st.layout or def.refresh then
     local ok, err = pcall(function()
-      st.layout:Refresh()
+      if st.layout then st.layout:Refresh() end
       if def.refresh then def.refresh(st.layout) end
     end)
     if not ok then

@@ -1,8 +1,8 @@
 ## Interface: 16001
 ## Title: Azeroth Familiar
-## Notes: Everyday toolkit for WoW Forever: overview dashboard, graphics presets, performance, character, bags, saved places, gameplay options, and an optional assistant for item and quest questions.
+## Notes: Everyday toolkit for WoW Forever: overview dashboard, graphics presets, performance, character, bags, Waylaid Crate planner, saved places, gameplay options, and an optional assistant for item and quest questions.
 ## Author: Trinchet
-## Version: 0.8.1
+## Version: 0.9.0
 ## SavedVariables: AzerothAssistantDB
 ## SavedVariablesPerCharacter: AzerothAssistantCharDB
 ## Category: Quests & Leveling
@@ -29,6 +29,14 @@ Tweaks.lua
 Modules\Stats.lua
 Modules\Reminders.lua
 Modules\BagHint.lua
+Crates\Core.lua
+Crates\Catalog.lua
+Crates\Cost.lua
+Crates\Bags.lua
+Crates\Providers.lua
+Crates\Scan.lua
+Crates\Model.lua
+Crates\Tooltip.lua
 UI\Widgets.lua
 UI\Shell.lua
 UI.lua
@@ -40,5 +48,6 @@ Modules\Inventory.lua
 Modules\World.lua
 Modules\Gameplay.lua
 Modules\Interface.lua
+Modules\Crates.lua
 ChatTab.lua
 Minimap.lua

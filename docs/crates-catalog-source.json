@@ -1,0 +1,728 @@
+{
+  "version": "2026-11-15.1",
+  "sourceBuild": "1.60.1.70532",
+  "targetBuild": "1.60.1.70938",
+  "coverage": "30 client recipe records; current build tooltip validation required; server drop availability not established",
+  "entries": [
+    {
+      "name": "Apprentice Herbs",
+      "url": "https://foreverdiff.com/items/waylaid-crate-apprentice-herbs-248682/",
+      "id": 248682,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 2447,
+          "name": "Peacebloom",
+          "quantity": 20
+        },
+        {
+          "itemID": 765,
+          "name": "Silverleaf",
+          "quantity": 20
+        },
+        {
+          "itemID": 2449,
+          "name": "Earthroot",
+          "quantity": 10
+        },
+        {
+          "itemID": 785,
+          "name": "Mageroyal",
+          "quantity": 10
+        },
+        {
+          "itemID": 2450,
+          "name": "Briarthorn",
+          "quantity": 10
+        }
+      ]
+    },
+    {
+      "name": "Apprentice Ore",
+      "url": "https://foreverdiff.com/items/waylaid-crate-apprentice-ore-248683/",
+      "id": 248683,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 2770,
+          "name": "Copper Ore",
+          "quantity": 20
+        },
+        {
+          "itemID": 2771,
+          "name": "Tin Ore",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "name": "Apprentice Textiles",
+      "url": "https://foreverdiff.com/items/waylaid-crate-apprentice-textiles-248684/",
+      "id": 248684,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 2589,
+          "name": "Linen Cloth",
+          "quantity": 40
+        },
+        {
+          "itemID": 2318,
+          "name": "Light Leather",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "name": "Apprentice Curiosities",
+      "url": "https://foreverdiff.com/items/waylaid-crate-apprentice-curiosities-248685/",
+      "id": 248685,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 10940,
+          "name": "Strange Dust",
+          "quantity": 20
+        },
+        {
+          "itemID": 10939,
+          "name": "Greater Magic Essence",
+          "quantity": 4
+        },
+        {
+          "itemID": 10978,
+          "name": "Small Glimmering Shard",
+          "quantity": 6
+        },
+        {
+          "itemID": 11084,
+          "name": "Large Glimmering Shard",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "name": "Journeyman Herbs",
+      "url": "https://foreverdiff.com/items/waylaid-crate-journeyman-herbs-248686/",
+      "id": 248686,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 3820,
+          "name": "Stranglekelp",
+          "quantity": 10
+        },
+        {
+          "itemID": 2453,
+          "name": "Bruiseweed",
+          "quantity": 10
+        },
+        {
+          "itemID": 3355,
+          "name": "Wild Steelbloom",
+          "quantity": 10
+        },
+        {
+          "itemID": 3369,
+          "name": "Grave Moss",
+          "quantity": 10
+        },
+        {
+          "itemID": 3356,
+          "name": "Kingsblood",
+          "quantity": 10
+        }
+      ]
+    },
+    {
+      "name": "Journeyman Ore",
+      "url": "https://foreverdiff.com/items/waylaid-crate-journeyman-ore-248687/",
+      "id": 248687,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 2775,
+          "name": "Silver Ore",
+          "quantity": 10
+        },
+        {
+          "itemID": 2772,
+          "name": "Iron Ore",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "name": "Journeyman Textiles",
+      "url": "https://foreverdiff.com/items/waylaid-crate-journeyman-textiles-248688/",
+      "id": 248688,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 2592,
+          "name": "Wool Cloth",
+          "quantity": 20
+        },
+        {
+          "itemID": 4306,
+          "name": "Silk Cloth",
+          "quantity": 40
+        },
+        {
+          "itemID": 2319,
+          "name": "Medium Leather",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "name": "Journeyman Curiosities",
+      "url": "https://foreverdiff.com/items/waylaid-crate-journeyman-curiosities-248689/",
+      "id": 248689,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 11083,
+          "name": "Soul Dust",
+          "quantity": 20
+        },
+        {
+          "itemID": 11082,
+          "name": "Greater Astral Essence",
+          "quantity": 4
+        },
+        {
+          "itemID": 11138,
+          "name": "Small Glowing Shard",
+          "quantity": 6
+        },
+        {
+          "itemID": 11139,
+          "name": "Large Glowing Shard",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "name": "Earthly Expert Herbs",
+      "url": "https://foreverdiff.com/items/waylaid-crate-earthly-expert-herbs-248690/",
+      "id": 248690,
+      "level": 20,
+      "bundles": [
+        {
+          "itemID": 3357,
+          "name": "Liferoot",
+          "quantity": 20
+        },
+        {
+          "itemID": 3818,
+          "name": "Fadeleaf",
+          "quantity": 10
+        },
+        {
+          "itemID": 3821,
+          "name": "Goldthorn",
+          "quantity": 10
+        },
+        {
+          "itemID": 3358,
+          "name": "Khadgar's Whisker",
+          "quantity": 10
+        }
+      ]
+    },
+    {
+      "name": "Flowering Expert Herbs",
+      "url": "https://foreverdiff.com/items/waylaid-crate-flowering-expert-herbs-248691/",
+      "id": 248691,
+      "level": 20,
+      "bundles": [
+        {
+          "itemID": 3819,
+          "name": "Wintersbite",
+          "quantity": 10
+        },
+        {
+          "itemID": 4625,
+          "name": "Firebloom",
+          "quantity": 10
+        },
+        {
+          "itemID": 8831,
+          "name": "Purple Lotus",
+          "quantity": 20
+        },
+        {
+          "itemID": 8836,
+          "name": "Arthas' Tears",
+          "quantity": 10
+        }
+      ]
+    },
+    {
+      "name": "Expert Ore",
+      "id": 248692,
+      "level": 20,
+      "url": "https://foreverdiff.com/items/waylaid-crate-expert-ore-248692/",
+      "bundles": [
+        {
+          "itemID": 2776,
+          "name": "Gold Ore",
+          "quantity": 10
+        },
+        {
+          "itemID": 3858,
+          "name": "Mithril Ore",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "name": "Expert Textiles",
+      "url": "https://foreverdiff.com/items/waylaid-crate-expert-textiles-248693/",
+      "id": 248693,
+      "level": 20,
+      "bundles": [
+        {
+          "itemID": 4338,
+          "name": "Mageweave Cloth",
+          "quantity": 40
+        },
+        {
+          "itemID": 4234,
+          "name": "Heavy Leather",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "name": "Expert Curiosities",
+      "url": "https://foreverdiff.com/items/waylaid-crate-expert-curiosities-248694/",
+      "id": 248694,
+      "level": 20,
+      "bundles": [
+        {
+          "itemID": 11137,
+          "name": "Vision Dust",
+          "quantity": 20
+        },
+        {
+          "itemID": 11135,
+          "name": "Greater Mystic Essence",
+          "quantity": 4
+        },
+        {
+          "itemID": 11177,
+          "name": "Small Radiant Shard",
+          "quantity": 6
+        },
+        {
+          "itemID": 11178,
+          "name": "Large Radiant Shard",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "name": "Earthly Artisan Herbs",
+      "url": "https://foreverdiff.com/items/waylaid-crate-earthly-artisan-herbs-248695/",
+      "id": 248695,
+      "level": 35,
+      "bundles": [
+        {
+          "itemID": 13464,
+          "name": "Golden Sansam",
+          "quantity": 10
+        },
+        {
+          "itemID": 8838,
+          "name": "Sungrass",
+          "quantity": 20
+        },
+        {
+          "itemID": 8839,
+          "name": "Blindweed",
+          "quantity": 10
+        },
+        {
+          "itemID": 8845,
+          "name": "Ghost Mushroom",
+          "quantity": 10
+        },
+        {
+          "itemID": 8846,
+          "name": "Gromsblood",
+          "quantity": 10
+        }
+      ]
+    },
+    {
+      "name": "Flowering Artisan Herbs",
+      "url": "https://foreverdiff.com/items/waylaid-crate-flowering-artisan-herbs-248696/",
+      "id": 248696,
+      "level": 35,
+      "bundles": [
+        {
+          "itemID": 13463,
+          "name": "Dreamfoil",
+          "quantity": 20
+        },
+        {
+          "itemID": 13465,
+          "name": "Mountain Silversage",
+          "quantity": 20
+        },
+        {
+          "itemID": 13466,
+          "name": "Plaguebloom",
+          "quantity": 20
+        },
+        {
+          "itemID": 13467,
+          "name": "Icecap",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "name": "Artisan Ore",
+      "url": "https://foreverdiff.com/items/waylaid-crate-artisan-ore-248697/",
+      "id": 248697,
+      "level": 35,
+      "bundles": [
+        {
+          "itemID": 7911,
+          "name": "Truesilver Ore",
+          "quantity": 10
+        },
+        {
+          "itemID": 10620,
+          "name": "Thorium Ore",
+          "quantity": 20
+        },
+        {
+          "name": "Dark Iron Ore",
+          "quantity": 20,
+          "itemID": 11370
+        }
+      ]
+    },
+    {
+      "name": "Artisan Textiles",
+      "url": "https://foreverdiff.com/items/waylaid-crate-artisan-textiles-248698/",
+      "id": 248698,
+      "level": 35,
+      "bundles": [
+        {
+          "itemID": 14047,
+          "name": "Runecloth",
+          "quantity": 40
+        },
+        {
+          "itemID": 4304,
+          "name": "Thick Leather",
+          "quantity": 20
+        },
+        {
+          "itemID": 8170,
+          "name": "Rugged Leather",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "name": "Artisan Curiosities",
+      "url": "https://foreverdiff.com/items/waylaid-crate-artisan-curiosities-248699/",
+      "id": 248699,
+      "level": 35,
+      "bundles": [
+        {
+          "itemID": 11176,
+          "name": "Dream Dust",
+          "quantity": 20
+        },
+        {
+          "itemID": 11175,
+          "name": "Greater Nether Essence",
+          "quantity": 4
+        },
+        {
+          "itemID": 14343,
+          "name": "Small Brilliant Shard",
+          "quantity": 6
+        },
+        {
+          "itemID": 14344,
+          "name": "Large Brilliant Shard",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "name": "Apprentice Fabrics",
+      "url": "https://foreverdiff.com/items/waylaid-crate-apprentice-fabrics-248702/",
+      "id": 248702,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 4231,
+          "name": "Cured Light Hide",
+          "quantity": 2
+        },
+        {
+          "itemID": 2996,
+          "name": "Bolt of Linen Cloth",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "name": "Apprentice Ingots",
+      "url": "https://foreverdiff.com/items/waylaid-crate-apprentice-ingots-248703/",
+      "id": 248703,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 2840,
+          "name": "Copper Bar",
+          "quantity": 20
+        },
+        {
+          "itemID": 3576,
+          "name": "Tin Bar",
+          "quantity": 20
+        },
+        {
+          "itemID": 2841,
+          "name": "Bronze Bar",
+          "quantity": 10
+        }
+      ]
+    },
+    {
+      "name": "Apprentice Parts",
+      "url": "https://foreverdiff.com/items/waylaid-crate-apprentice-parts-248704/",
+      "id": 248704,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 4359,
+          "name": "Handful of Copper Bolts",
+          "quantity": 16
+        },
+        {
+          "itemID": 4361,
+          "name": "Copper Tube",
+          "quantity": 16
+        },
+        {
+          "itemID": 4363,
+          "name": "Copper Modulator",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "name": "Journeyman Fabrics",
+      "url": "https://foreverdiff.com/items/waylaid-crate-journeyman-fabrics-248705/",
+      "id": 248705,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 2997,
+          "name": "Bolt of Woolen Cloth",
+          "quantity": 6
+        },
+        {
+          "itemID": 4305,
+          "name": "Bolt of Silk Cloth",
+          "quantity": 10
+        },
+        {
+          "itemID": 4233,
+          "name": "Cured Medium Hide",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "name": "Journeyman Ingots",
+      "url": "https://foreverdiff.com/items/waylaid-crate-journeyman-ingots-248706/",
+      "id": 248706,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 2842,
+          "name": "Silver Bar",
+          "quantity": 10
+        },
+        {
+          "itemID": 3575,
+          "name": "Iron Bar",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "name": "Journeyman Parts",
+      "url": "https://foreverdiff.com/items/waylaid-crate-journeyman-parts-248707/",
+      "id": 248707,
+      "level": 10,
+      "bundles": [
+        {
+          "itemID": 4371,
+          "name": "Bronze Tube",
+          "quantity": 8
+        },
+        {
+          "itemID": 4375,
+          "name": "Whirring Bronze Gizmo",
+          "quantity": 7
+        },
+        {
+          "itemID": 4382,
+          "name": "Bronze Framework",
+          "quantity": 4
+        },
+        {
+          "name": "Gold Power Core",
+          "quantity": 45,
+          "itemID": 10558
+        }
+      ]
+    },
+    {
+      "name": "Expert Fabrics",
+      "url": "https://foreverdiff.com/items/waylaid-crate-expert-fabrics-248708/",
+      "id": 248708,
+      "level": 20,
+      "bundles": [
+        {
+          "itemID": 4339,
+          "name": "Bolt of Mageweave",
+          "quantity": 8
+        },
+        {
+          "itemID": 4236,
+          "name": "Cured Heavy Hide",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "name": "Expert Ingots",
+      "url": "https://foreverdiff.com/items/waylaid-crate-expert-ingots-248709/",
+      "id": 248709,
+      "level": 20,
+      "bundles": [
+        {
+          "itemID": 3860,
+          "name": "Mithril Bar",
+          "quantity": 20
+        },
+        {
+          "itemID": 3859,
+          "name": "Steel Bar",
+          "quantity": 15
+        },
+        {
+          "itemID": 3577,
+          "name": "Gold Bar",
+          "quantity": 10
+        }
+      ]
+    },
+    {
+      "name": "Expert Parts",
+      "url": "https://foreverdiff.com/items/waylaid-crate-expert-parts-248710/",
+      "id": 248710,
+      "level": 20,
+      "bundles": [
+        {
+          "itemID": 4387,
+          "name": "Iron Strut",
+          "quantity": 8
+        },
+        {
+          "itemID": 10559,
+          "name": "Mithril Tube",
+          "quantity": 5
+        },
+        {
+          "itemID": 10560,
+          "name": "Unstable Trigger",
+          "quantity": 12
+        },
+        {
+          "itemID": 10561,
+          "name": "Mithril Casing",
+          "quantity": 5
+        }
+      ]
+    },
+    {
+      "name": "Artisan Fabrics",
+      "url": "https://foreverdiff.com/items/waylaid-crate-artisan-fabrics-248711/",
+      "id": 248711,
+      "level": 35,
+      "bundles": [
+        {
+          "itemID": 14048,
+          "name": "Bolt of Runecloth",
+          "quantity": 8
+        },
+        {
+          "itemID": 8172,
+          "name": "Cured Thick Hide",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "name": "Artisan Ingots",
+      "url": "https://foreverdiff.com/items/waylaid-crate-artisan-ingots-248712/",
+      "id": 248712,
+      "level": 35,
+      "bundles": [
+        {
+          "itemID": 11371,
+          "name": "Dark Iron Bar",
+          "quantity": 2
+        },
+        {
+          "itemID": 6037,
+          "name": "Truesilver Bar",
+          "quantity": 10
+        },
+        {
+          "itemID": 12359,
+          "name": "Thorium Bar",
+          "quantity": 20
+        }
+      ]
+    },
+    {
+      "name": "Artisan Parts",
+      "url": "https://foreverdiff.com/items/waylaid-crate-artisan-parts-248713/",
+      "id": 248713,
+      "level": 35,
+      "bundles": [
+        {
+          "itemID": 15994,
+          "name": "Thorium Widget",
+          "quantity": 5
+        },
+        {
+          "itemID": 18631,
+          "name": "Truesilver Transformer",
+          "quantity": 5
+        },
+        {
+          "itemID": 16000,
+          "name": "Thorium Tube",
+          "quantity": 2
+        }
+      ]
+    }
+  ]
+}

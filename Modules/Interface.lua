@@ -75,6 +75,11 @@ local function build(L, p)
     function(x) S().remind.cheapest = x; if AA.BagHint then AA.BagHint.Update() end end,
     "Looting with full bags: mark what to drop",
     "When you open a loot window with no bag slots left, the stack worth the least is marked DROP (vendor price, or the Auctionator auction price when higher) in your bags (default bags or Bagnon) and named in chat. Closed bags open for it and close again with the loot window. Items with no vendor price and profession tools are never picked. Nothing is sold or deleted for you.")
+  L:Check("Crate tooltips: highlight the cheapest bundle",
+    function() return S().crates.tooltip ~= false end,
+    function(x) if AA.Crates and AA.Crates.Tooltip then AA.Crates.Tooltip:SetEnabled(x) else S().crates.tooltip = x end end,
+    "Crate tooltips: highlight the cheapest bundle",
+    "Hovering a supported Waylaid Crate adds a short Crates summary and colors its cheapest bundle line: green when confirmed by a fresh AH scan or already owned, amber when it is only a cached estimate. See the Crates page.")
   remind("vendor", "At a vendor: grey items and repair cost", "One line when you open a vendor with grey items to sell or repairs to make. Nothing is sold or repaired for you.")
   remind("levelup", "Level-up summary", "One line with your session length and experience per hour when you level.")
 
