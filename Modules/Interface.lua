@@ -29,22 +29,6 @@ function AA.ResetInterfaceSettings()
 end
 
 local function build(L, p)
-  -- About: the logo, name and version at the top of the settings.
-  do
-    local y = L:Row(80)
-    local logo = p:CreateTexture(nil, "ARTWORK")
-    logo:SetTexture("Interface\\AddOns\\AzerothAssistant\\Media\\Logo")
-    logo:SetSize(68, 68)
-    logo:SetPoint("TOPLEFT", 10, y - 4)
-    local name = W.Text(p, AA.NAME or "Azeroth Familiar", "GameFontNormalLarge")
-    name:SetPoint("TOPLEFT", 90, y - 14)
-    local ver = W.Text(p, W.GREY .. "Version " .. tostring(AA.VERSION) .. "|r", "GameFontHighlightSmall")
-    ver:SetPoint("TOPLEFT", name, "BOTTOMLEFT", 0, -4)
-    local hint = W.Text(p, "Your sidekick for WoW Forever. Type /fam help for all commands.", "GameFontHighlightSmall")
-    hint:SetPoint("TOPLEFT", ver, "BOTTOMLEFT", 0, -6)
-    hint:SetPoint("RIGHT", p, "RIGHT", -12, 0)
-  end
-
   L:Header("Window")
   L:Stepper("Window size", {
     get = function() return S().windowScale end,
