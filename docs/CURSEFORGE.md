@@ -1,3 +1,5 @@
+![Azeroth Familiar](https://raw.githubusercontent.com/xdsliperz1830-eng/azeroth-familiar/main/screenshots/logo.png)
+
 # Azeroth Familiar
 
 **Your all-in-one sidekick for World of Warcraft: Forever.** One tidy window with everything you reach for every session, plus a helper that answers your item and quest questions right in game.

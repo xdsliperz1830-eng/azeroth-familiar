@@ -51,8 +51,8 @@ function M.Create()
   icon:SetSize(18, 18)
   -- Centre of the tracking-border ring, measured in game.
   icon:SetPoint("CENTER", 1.5, -0.5)
-  -- Crop inside the logo's gold frame, shifted so the letter (drawn slightly high) is centred.
-  icon:SetTexCoord(0.11, 0.87, 0.09, 0.85)
+  -- Show the logo's round badge (gold ring and griffin); the compass points are trimmed.
+  icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
   local border = b:CreateTexture(nil, "OVERLAY")
   border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
   border:SetSize(53, 53)

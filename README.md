@@ -1,3 +1,5 @@
+<p align="center"><img src="screenshots/logo.png" alt="Azeroth Familiar logo" width="160"></p>
+
 # Azeroth Familiar
 
 *Formerly Azeroth Assistant.* The addon folder is still `AzerothAssistant`, so saved settings, the minimap button position and the desktop companion keep working after the rename.
