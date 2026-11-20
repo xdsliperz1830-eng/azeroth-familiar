@@ -8,6 +8,9 @@ local M = {}
 AA.Minimap = M
 
 M.ICON = "Interface\\AddOns\\AzerothAssistant\\Media\\Logo"
+-- A separate small texture for the minimap button: the griffin badge cropped close and
+-- pre-shrunk to 32 px, so it stays sharp at button size instead of being squashed from 128.
+M.BUTTON_ICON = "Interface\\AddOns\\AzerothAssistant\\Media\\LogoMinimap"
 
 local atan2 = math.atan2 or atan2
 
@@ -47,12 +50,12 @@ function M.Create()
   bg:SetSize(20, 20)
   bg:SetPoint("CENTER", 1.5, -0.5)
   local icon = b:CreateTexture(nil, "ARTWORK")
-  icon:SetTexture(M.ICON)
-  icon:SetSize(18, 18)
+  icon:SetTexture(M.BUTTON_ICON)
+  icon:SetSize(20, 20)
   -- Centre of the tracking-border ring, measured in game.
   icon:SetPoint("CENTER", 1.5, -0.5)
-  -- Show the logo's round badge (gold ring and griffin); the compass points are trimmed.
-  icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
+  -- Round, so it fills the button's circle; clients without masks show it square.
+  if icon.SetMask then pcall(icon.SetMask, icon, "Interface\\CharacterFrame\\TempPortraitAlphaMask") end
   local border = b:CreateTexture(nil, "OVERLAY")
   border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
   border:SetSize(53, 53)
