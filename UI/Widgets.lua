@@ -40,6 +40,88 @@ function W.Border(f, r, g, b, a)
   edge("TOPRIGHT", "BOTTOMRIGHT", 1, nil)
 end
 
+-- Ornate gold frame ---------------------------------------------------------------
+-- Media\Frame.tga holds the whole frame artwork at half size (768x512 of a 1024x512
+-- texture). It is drawn as a 9-slice: corners keep their shape, plain strips of each band
+-- stretch, and the gem ornaments stay centred and unstretched. Numbers are in source
+-- pixels of the 1536x1024 original.
+W.FRAME_TEX = "Interface\\AddOns\\AzerothAssistant\\Media\\Frame"
+local FR = {
+  OL = 16, OT = 20, OR = 16, OB = 26,   -- transparent margin outside the outer gold line
+  IL = 45, IT = 71, IR = 45, IB = 63,   -- band thickness (outer line to inner edge)
+  CURL = 74,                            -- how far the corner curls reach inside the band
+  C = 240,                              -- corner piece size
+}
+
+local function frameTex(holder, sx, sy, sw, sh, s, sub)
+  local t = holder:CreateTexture(nil, "ARTWORK", nil, sub or 0)
+  local ok = t:SetTexture(W.FRAME_TEX)
+  t:SetTexCoord(sx / 2048, (sx + sw) / 2048, sy / 1024, (sy + sh) / 1024)
+  t:SetSize(sw * s, sh * s)
+  return t, ok
+end
+
+-- Draws the frame on f at scale s (screen px per source px).
+-- opts.outside: put the frame around the outside of f, with the corner curls in a gap
+--   filled with opts.bg ({r, g, b, a}), so nothing inside f moves.
+-- Otherwise the gold outer line is f's edge and the bands lie inside it.
+-- Returns the inside insets { l, t, r, b, curl } (all 0 when outside), or nil when the
+-- texture can't be used (callers then keep their plain border).
+function W.OrnateFrame(f, s, opts)
+  opts = opts or {}
+  local holder = CreateFrame("Frame", nil, f)
+  holder:SetAllPoints(f)
+  holder:SetFrameLevel(f:GetFrameLevel() + 30)   -- ornaments sit over the edge of the content
+  local push = { l = 0, t = 0, r = 0, b = 0 }
+  if opts.outside then
+    local gap = FR.CURL * s
+    push = { l = FR.IL * s + gap, t = FR.IT * s + gap, r = FR.IR * s + gap, b = FR.IB * s + gap }
+    local bg = opts.bg or { 0.04, 0.04, 0.06, 0.97 }
+    local fill = f:CreateTexture(nil, "BACKGROUND", nil, -8)
+    fill:SetColorTexture(bg[1], bg[2], bg[3], bg[4])
+    fill:SetPoint("TOPLEFT", -(push.l - FR.IL * s * 0.5), push.t - FR.IT * s * 0.5)
+    fill:SetPoint("BOTTOMRIGHT", push.r - FR.IR * s * 0.5, -(push.b - FR.IB * s * 0.5))
+    holder.fill = fill
+  end
+  local C = FR.C
+  local tl, ok = frameTex(holder, 0, 0, C, C, s, 1)
+  if ok == false then holder:Hide(); return nil end
+  tl:SetPoint("TOPLEFT", -(FR.OL * s + push.l), FR.OT * s + push.t)
+  local tr = frameTex(holder, 1536 - C, 0, C, C, s, 1)
+  tr:SetPoint("TOPRIGHT", FR.OR * s + push.r, FR.OT * s + push.t)
+  local bl = frameTex(holder, 0, 1024 - C, C, C, s, 1)
+  bl:SetPoint("BOTTOMLEFT", -(FR.OL * s + push.l), -(FR.OB * s + push.b))
+  local br = frameTex(holder, 1536 - C, 1024 - C, C, C, s, 1)
+  br:SetPoint("BOTTOMRIGHT", FR.OR * s + push.r, -(FR.OB * s + push.b))
+  -- plain strips between the corners
+  local top = frameTex(holder, 300, 0, 8, 110, s)
+  top:SetPoint("TOPLEFT", tl, "TOPRIGHT"); top:SetPoint("TOPRIGHT", tr, "TOPLEFT")
+  local bottom = frameTex(holder, 300, 914, 8, 110, s)
+  bottom:SetPoint("BOTTOMLEFT", bl, "BOTTOMRIGHT"); bottom:SetPoint("BOTTOMRIGHT", br, "BOTTOMLEFT")
+  local left = frameTex(holder, 0, 300, 80, 8, s)
+  left:SetPoint("TOPLEFT", tl, "BOTTOMLEFT"); left:SetPoint("BOTTOMLEFT", bl, "TOPLEFT")
+  local right = frameTex(holder, 1456, 300, 80, 8, s)
+  right:SetPoint("TOPRIGHT", tr, "BOTTOMRIGHT"); right:SetPoint("BOTTOMRIGHT", br, "TOPRIGHT")
+  -- centred ornaments (the window's centre lines up with the artwork's centre)
+  local midY = ((push.t - push.b) / 2) + 15 * s
+  local o = frameTex(holder, 496, 0, 544, 110, s, 2)
+  o:SetPoint("TOP", (push.r - push.l) / 2, FR.OT * s + push.t)
+  o = frameTex(holder, 576, 914, 384, 110, s, 2)
+  o:SetPoint("BOTTOM", (push.r - push.l) / 2, -(FR.OB * s + push.b))
+  o = frameTex(holder, 0, 410, 80, 168, s, 2)
+  o:SetPoint("LEFT", -(FR.OL * s + push.l), midY)
+  o = frameTex(holder, 1456, 410, 80, 168, s, 2)
+  o:SetPoint("RIGHT", FR.OR * s + push.r, midY)
+  f.ornate = holder
+  if opts.outside then return { l = 0, t = 0, r = 0, b = 0, curl = 0 } end
+  return { l = FR.IL * s, t = FR.IT * s, r = FR.IR * s, b = FR.IB * s, curl = (FR.CURL - 5) * s }
+end
+
+-- How far a frame drawn with opts.outside reaches past each side of its window.
+function W.OrnateReach(s)
+  return (FR.OL + FR.IL + FR.CURL) * s
+end
+
 -- Tooltip on hover. extra: optional list of grey lines (or a function returning one).
 function W.Tip(f, title, text, extra)
   if not title then return end

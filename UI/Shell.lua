@@ -12,8 +12,13 @@ local W = AA.W
 Sh.defs = {}   -- id -> definition
 Sh.order = {}  -- sorted list of definitions
 local state = {} -- id -> { frame, layout, built, broken }
-local nav, host, navButtons, modeText, current
+local nav, host, navButtons, modeText, current, shellFrame
 local NAV_W, NAV_COMPACT = 128, 36
+
+-- Space taken by the window's frame on each side (set by UI.lua; 1 px for the plain border).
+local function frameInsets()
+  return (shellFrame and shellFrame.aaInsets) or { l = 1, t = 1, r = 1, b = 1, curl = 0 }
+end
 local flashToken = 0
 
 -- def: { id, title, icon, order, subtitle, build(L, page), refresh(L), interval, frame, onShow }
@@ -145,7 +150,9 @@ function Sh.ApplyLayout()
   nav:SetWidth(w)
   host:ClearAllPoints()
   host:SetPoint("TOPLEFT", nav, "TOPRIGHT", 1, 0)
-  host:SetPoint("BOTTOMRIGHT", -1, 1)
+  -- inside the right and bottom bands, and above the bottom-right corner curl
+  local ins = frameInsets()
+  host:SetPoint("BOTTOMRIGHT", -ins.r, ins.b + ins.curl)
   for _, b in pairs(navButtons) do
     b:SetWidth(w - 2)
     if compact then b.text:Hide() else b.text:Show() end
@@ -155,9 +162,12 @@ end
 -- Called once by UI.lua when the window is created.
 function Sh.Attach(frame, mode)
   modeText = mode
+  shellFrame = frame
+  local ins = frameInsets()
   nav = CreateFrame("Frame", nil, frame)
-  nav:SetPoint("TOPLEFT", 1, -26)
-  nav:SetPoint("BOTTOMLEFT", 1, 1)
+  -- inside the left, top (below the 24 px title bar) and bottom bands; 2 px clear of the side gems
+  nav:SetPoint("TOPLEFT", ins.l + 2, -(ins.t + 25))
+  nav:SetPoint("BOTTOMLEFT", ins.l + 2, ins.b)
   nav:SetWidth(NAV_W)
   W.Bg(nav, 0.08, 0.08, 0.10, 1)
   local edge = nav:CreateTexture(nil, "BORDER")

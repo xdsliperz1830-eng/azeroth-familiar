@@ -7,7 +7,10 @@ local ADDON, AA = ...
 local UI = {}
 AA.UI = UI
 
-local MIN_W, MIN_H = 640, 420
+local MIN_W, MIN_H = 670, 470   -- room for the frame bands; pages keep their old space
+-- Size of the ornate frame (screen px per px of the frame artwork): main window, dialogs,
+-- and the Assistant's Settings panel.
+UI.FRAME_SCALE, UI.DIALOG_FRAME_SCALE, UI.PANEL_FRAME_SCALE = 0.3, 0.2, 0.12
 
 local function tryTemplate(ftype, parent, template)
   local ok, f = pcall(CreateFrame, ftype, nil, parent, template)
@@ -122,7 +125,10 @@ local function makeDialogFrame(name, w, h, title)
   d:SetScript("OnDragStop", d.StopMovingOrSizing)
   d:SetClampedToScreen(true)
   addBackground(d, 0.04, 0.04, 0.06, 0.97)
-  addBorder(d)
+  -- The small ornate frame goes around the outside, so nothing inside the box moves.
+  if not (AA.W.OrnateFrame and AA.W.OrnateFrame(d, UI.DIALOG_FRAME_SCALE, { outside = true, bg = { 0.04, 0.04, 0.06, 0.97 } })) then
+    addBorder(d)
+  end
   d:Hide()
   d.title = d:CreateFontString(nil, "OVERLAY", "GameFontNormal")
   d.title:SetPoint("TOPLEFT", 10, -8)
@@ -293,10 +299,10 @@ local function restorePosition()
   frame:ClearAllPoints()
   if p and p.point then
     frame:SetPoint(p.point, UIParent, p.relPoint or p.point, p.x or 0, p.y or 0)
-    frame:SetSize(math.max(MIN_W, p.w or 720), math.max(MIN_H, p.h or 480))
+    frame:SetSize(math.max(MIN_W, p.w or 750), math.max(MIN_H, p.h or 540))
   else
     frame:SetPoint("CENTER", UIParent, "CENTER", 0, 60)
-    frame:SetSize(720, 480)
+    frame:SetSize(750, 540)
   end
 end
 
@@ -439,14 +445,21 @@ local function create()
   elseif frame.SetMinResize then frame:SetMinResize(MIN_W, MIN_H) end
   frame:EnableMouse(true)
   UI.bg = addBackground(frame, 0.05, 0.05, 0.07, 0.92)
-  addBorder(frame)
+  -- Ornate gold frame (UI/Widgets.lua); the plain bronze line if its texture can't be used.
+  -- ins = how far the bands reach inside; curl = how far the corner curls reach past them.
+  local ins = AA.W.OrnateFrame and AA.W.OrnateFrame(frame, UI.FRAME_SCALE)
+  if not ins then
+    addBorder(frame)
+    ins = { l = 1, t = 1, r = 1, b = 1, curl = 0 }
+  end
+  frame.aaInsets = ins
   restorePosition()
   frame:Hide()
 
-  -- Title bar (drag to move)
+  -- Title bar (drag to move), just inside the top band
   local bar = CreateFrame("Frame", nil, frame)
-  bar:SetPoint("TOPLEFT", 1, -1)
-  bar:SetPoint("TOPRIGHT", -1, -1)
+  bar:SetPoint("TOPLEFT", ins.l, -ins.t)
+  bar:SetPoint("TOPRIGHT", -ins.r, -ins.t)
   bar:SetHeight(24)
   addBackground(bar, 0.10, 0.08, 0.06, 1)
   bar:EnableMouse(true)
@@ -454,11 +467,11 @@ local function create()
   bar:SetScript("OnDragStart", function() frame:StartMoving() end)
   bar:SetScript("OnDragStop", function() frame:StopMovingOrSizing(); savePosition() end)
   local title = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  title:SetPoint("LEFT", 8, 0)
+  title:SetPoint("LEFT", 8 + ins.curl, 0)          -- clear of the corner curl
   title:SetText("Azeroth Familiar")
   local mode = bar:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
   mode:SetPoint("LEFT", title, "RIGHT", 8, 0)
-  mode:SetPoint("RIGHT", bar, "RIGHT", -30, 0)
+  mode:SetPoint("RIGHT", bar, "RIGHT", -30 - ins.curl, 0)
   mode:SetJustifyH("LEFT")
   if mode.SetWordWrap then mode:SetWordWrap(false) end
   mode:SetText("")
@@ -468,7 +481,7 @@ local function create()
     local fs = close:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     fs:SetPoint("CENTER"); fs:SetText("x")
   end
-  close:SetPoint("RIGHT", 0, 0)
+  close:SetPoint("RIGHT", -ins.curl, 0)
   close:SetScript("OnClick", function() frame:Hide() end)
 
   -- Navigation + page host (UI/Shell.lua). The assistant chat below is one of the pages.
@@ -543,8 +556,16 @@ local function create()
 
   -- Settings overlay sits on top of the conversation area
   UI.settings = buildSettings(chat)
-  UI.settings:SetAllPoints(msg)
   UI.settings:SetFrameLevel(msg:GetFrameLevel() + 5)
+  -- Inset by the small frame's reach, so the frame drawn around it stays over the
+  -- conversation area and never covers the toolbar or the input box.
+  local reach = AA.W.OrnateFrame and AA.W.OrnateReach(UI.PANEL_FRAME_SCALE) or 0
+  if reach > 0 and AA.W.OrnateFrame(UI.settings, UI.PANEL_FRAME_SCALE, { outside = true, bg = { 0.06, 0.06, 0.09, 0.98 } }) then
+    UI.settings:SetPoint("TOPLEFT", msg, "TOPLEFT", reach, -reach)
+    UI.settings:SetPoint("BOTTOMRIGHT", msg, "BOTTOMRIGHT", -reach, reach)
+  else
+    UI.settings:SetAllPoints(msg)
+  end
 
   -- Input
   local input = makeInput(chat)
@@ -569,7 +590,9 @@ local function create()
   -- Resize grip
   local grip = CreateFrame("Button", nil, frame)
   grip:SetSize(16, 16)
-  grip:SetPoint("BOTTOMRIGHT", -1, 1)
+  -- in the strip above the bottom band, left of the corner curl
+  grip:SetPoint("BOTTOMRIGHT", -(ins.r + ins.curl + 2), ins.b + 2)
+  grip:SetFrameLevel(frame:GetFrameLevel() + 40)   -- above the frame's ornaments
   grip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
   grip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
   grip:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
