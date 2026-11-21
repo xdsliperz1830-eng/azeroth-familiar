@@ -44,6 +44,9 @@ function I:ValidateCatalog()
             end
             tip:Hide()
             local text=clean(table.concat(lines," "))
+            -- kept for /fam diag: what this client actually rendered (first 400 characters)
+            C.renderedTooltip=C.renderedTooltip or {}
+            C.renderedTooltip[id]={lines=#lines,text=text:sub(1,400)}
             if not text:find("Fill the crate with any bundle",1,true) then return false,"Fill tooltip missing or changed" end
             if required~=crate.level then return false,"Level requirement changed" end
             local start=text:find("Fill the crate with any bundle",1,true)

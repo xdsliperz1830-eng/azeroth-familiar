@@ -1,5 +1,21 @@
 # In-game test checklist
 
+## v0.9.4: moving the window
+`/reload` is enough.
+- [ ] Drag the gold frame, the title bar, the empty nav area below the page list, and empty space on Overview and Crates: the window moves each time. Buttons, rows, checkboxes and the text box still click normally.
+- [ ] `/reload`: the window opens where you left it.
+- [ ] Interface page: tick "Lock window position", dragging does nothing; the title bar tooltip says it's locked. Untick: moving works again.
+- [ ] `/fam center` brings the window back to the middle of the screen.
+
+## v0.9.3: Crates page layout
+`/reload` is enough.
+- [ ] Columns line up under Crate, Lvl, Best bundle, Need, Cost, Status, with space between Cost and Status. No text overlaps.
+- [ ] The BEST / EST badge sits at the right of the bundle column and never covers the bundle name.
+- [ ] Expanded rows: each bundle shows a small gold "Search" link, "Bundle N · own x/y", its icon and name in the bundle column. Estimates no longer add an empty "Plan" row; live scans show "Buy ..." steps under the bundle.
+- [ ] "Count owned" sits next to the tabs (All Crates) and the AH note, recipe count and legend are not cut off at the default size.
+- [ ] Resize the window wider and narrower: names get the extra room, numbers stay aligned.
+- [ ] An unverified crate, expanded, shows "Not verified:" with the whole reason. `/fam diag` saves crate reasons and the rendered tooltip text.
+
 ## v0.9.0: Crates page (Crate Scout merged)
 Fully exit and restart WoW (new files in the .toc). The standalone Crate Scout addon is retired: remove or disable it. Nothing below has been run in the real game yet.
 - [ ] **Crates** appears in the navigation with a crate icon; `/fam crates` and `/cratescout` open it. No red error note.

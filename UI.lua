@@ -10,7 +10,7 @@ AA.UI = UI
 local MIN_W, MIN_H = 670, 470   -- room for the frame bands; pages keep their old space
 -- Size of the ornate frame (screen px per px of the frame artwork): main window, dialogs,
 -- and the Assistant's Settings panel.
-UI.FRAME_SCALE, UI.DIALOG_FRAME_SCALE, UI.PANEL_FRAME_SCALE = 0.3, 0.2, 0.12
+UI.FRAME_SCALE, UI.DIALOG_FRAME_SCALE, UI.PANEL_FRAME_SCALE = 0.25, 0.2, 0.12
 
 local function tryTemplate(ftype, parent, template)
   local ok, f = pcall(CreateFrame, ftype, nil, parent, template)
@@ -462,10 +462,33 @@ local function create()
   bar:SetPoint("TOPRIGHT", -ins.r, -ins.t)
   bar:SetHeight(24)
   addBackground(bar, 0.10, 0.08, 0.06, 1)
+  -- Moving: drag the title bar, the gold frame, or any empty part of the window (buttons,
+  -- rows and boxes keep their own clicks). "Lock window position" on the Interface page
+  -- turns this off.
+  local function startMove()
+    if S().lockWindow then return end
+    frame:StartMoving()
+  end
+  local function stopMove() frame:StopMovingOrSizing(); savePosition() end
+  frame:RegisterForDrag("LeftButton")
+  frame:SetScript("OnDragStart", startMove)
+  frame:SetScript("OnDragStop", stopMove)
   bar:EnableMouse(true)
   bar:RegisterForDrag("LeftButton")
-  bar:SetScript("OnDragStart", function() frame:StartMoving() end)
-  bar:SetScript("OnDragStop", function() frame:StopMovingOrSizing(); savePosition() end)
+  bar:SetScript("OnDragStart", startMove)
+  bar:SetScript("OnDragStop", stopMove)
+  bar:SetScript("OnEnter", function(self)
+    GameTooltip:SetOwner(self, "ANCHOR_TOP")
+    GameTooltip:AddLine("Azeroth Familiar")
+    if S().lockWindow then
+      GameTooltip:AddLine("Window locked. Unlock it on the Interface page.", 1, 1, 1, true)
+    else
+      GameTooltip:AddLine("Drag here, or on any empty part of the window, to move it.", 1, 1, 1, true)
+    end
+    GameTooltip:AddLine("/fam center puts it back in the middle of the screen.", 0.6, 0.6, 0.6, true)
+    GameTooltip:Show()
+  end)
+  bar:SetScript("OnLeave", function() GameTooltip:Hide() end)
   local title = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
   title:SetPoint("LEFT", 8 + ins.curl, 0)          -- clear of the corner curl
   title:SetText("Azeroth Familiar")
@@ -651,6 +674,15 @@ end
 
 function UI.Clear()
   if frame then UI.messages:Clear() end
+end
+
+-- Back to the default spot (also when it was dragged somewhere awkward).
+function UI.CenterWindow()
+  local f = ensure()
+  f:ClearAllPoints()
+  f:SetPoint("CENTER", UIParent, "CENTER", 0, 60)
+  savePosition()
+  f:Show()
 end
 
 function UI.Show()

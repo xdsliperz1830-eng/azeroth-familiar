@@ -436,13 +436,13 @@ test("page: three views, best badge, expanded plans, Buy & Fill breakdown, empty
     eq(strip(parent.fields.cost.text),"13s 12c")
     assert(find(function(w) return w.badge.text=="BEST" and w~=parent end))
     assert(find(function(w) return w.crate.text and w.crate.text:find("own 0/20",1,true) end))
-    assert(find(function(w) return w.crate.text and w.crate.text:find("whole stack",1,true) end))
+    assert(find(function(w) return w.fields.bundle.text and w.fields.bundle.text:find("Buy stack of 40",1,true) end))
     C.mode="All Crates"; P:Refresh(); assert(P.index>=30) -- every recipe stays visible
     C.mode="Buy & Fill"; C.live[CUR]={complete=true,time=now,rows={stack(77,3,900)}}; P:Refresh()
     assert(find(function(w) return w.crate.text and w.crate.text:find("Empty crate",1,true) end))
     assert(find(function(w) return w.crate.text and w.crate.text:find("Materials",1,true) end))
-    local e=find(function(w) return w.crate.text and w.crate.text:find("Extra crates",1,true) end); eq(e.fields.need.text,"2")
-    local t=find(function(w) return w.crate.text and w.crate.text:find("Total cash required",1,true) end); eq(strip(t.fields.cost.text),"22s 12c")
+    local e=find(function(w) return w.fields.bundle.text and w.fields.bundle.text:find("Extra crates",1,true) end); eq(e.fields.need.text,"2")
+    local t=find(function(w) return w.crate.text and w.crate.text:find("Total cash for this crate",1,true) end); eq(strip(t.fields.cost.text),"22s 12c")
     C.mode="My Crates"; C.owned={}; P:Refresh(); assert(P.empty.text:find("No Waylaid Crates",1,true))
     C.live={}
 end)
@@ -498,4 +498,23 @@ test("one tooltip summary header names Azeroth Familiar",function()
     C.live={}
 end)
 
+test("page layout: columns never overlap or overflow, at small, default and large widths",function()
+    for _,width in ipairs({480,566,700,1000}) do
+        local c=C.UI.Columns(width); local prev=0
+        for _,k in ipairs({"crate","level","bundle","need","cost","status"}) do
+            assert(c[k].x>=prev,"overlap at "..k.." width "..width); assert(c[k].w>0); prev=c[k].x+c[k].w+1
+        end
+        assert(c.status.x+c.status.w<=width,"overflow at width "..width)
+        assert(c.bundle.w>=100 and c.crate.w>=70)
+    end
+    local small,big=C.UI.Columns(566),C.UI.Columns(1000)
+    assert(big.bundle.w>small.bundle.w and big.crate.w>small.crate.w) -- extra width goes to the names
+    eq(big.status.w,small.status.w) -- numbers keep their columns
+end)
+test("window moving: default unlocked, /fam center recenters",function()
+    eq(AA.db.settings.lockWindow,false)
+    local centered=0; AA.UI={ShowPage=function() end,CenterWindow=function() centered=centered+1 end}
+    SlashCmdList.AZEROTHASSISTANT("center"); eq(centered,1)
+    SlashCmdList.AZEROTHASSISTANT("centre"); eq(centered,2)
+end)
 print("Passed "..passed.." Crates test groups (includes 200 exhaustive optimizer comparisons)")

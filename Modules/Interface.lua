@@ -49,6 +49,10 @@ local function build(L, p)
     function() return S().compactNav end,
     function(x) S().compactNav = x; AA.Shell.ApplyLayout() end,
     "Compact navigation", "Shows only the icons on the left, leaving more room for the page.")
+  L:Check("Lock window position",
+    function() return S().lockWindow end,
+    function(x) S().lockWindow = x end,
+    "Lock window position", "When ticked, the window can't be dragged. Untick to move it again by dragging the title bar or any empty part of the window. /fam center puts it back in the middle.")
   L:Check("Minimap button",
     function() return not S().minimap.hide end,
     function(x) S().minimap.hide = not x; if AA.Minimap then AA.Minimap.Refresh() end end)

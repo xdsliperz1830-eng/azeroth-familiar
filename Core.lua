@@ -5,7 +5,7 @@
 local ADDON, AA = ...
 AzerothAssistant = AA -- global handle for /dump debugging only
 
-AA.VERSION = "0.9.0"
+AA.VERSION = "0.9.5"
 AA.NAME = "Azeroth Familiar"
 AA.MAX_HISTORY_LINES = 400
 AA.MAX_IMPORT_CHARS = 4000
@@ -52,6 +52,7 @@ local DEFAULTS = {
     remind = { durability = true, bags = true, cheapest = true, vendor = true, levelup = true },
     perfDisplay = false,    -- small on-screen FPS readout
     perfLatency = true,     -- include world latency in it
+    lockWindow = false,     -- true: the window can't be dragged
     -- Crates page (v0.9.0, formerly the Crate Scout addon)
     crates = { countOwned = false, tooltip = true },
   },
@@ -304,6 +305,7 @@ local HELP = {
   "/fam fps  - show or hide the on-screen frame rate",
   "/fam diag  - check which game features this client has (saved for troubleshooting)",
   "/fam minimap  - show or hide the minimap button",
+  "/fam center  - move the window back to the middle of the screen",
   "/fam tab  - create (or bring back) the Assistant chat tab",
   "/fam check  - reload to pick up answers from the desktop companion",
   "/fam clear  - clear the conversation",
@@ -350,6 +352,9 @@ function AA:Slash(msg)
     local ok, text = AA.World.SaveHere(msg:sub(5))
     AA:Print((ok and "" or AA.C.warn) .. text .. (ok and "" or "|r"))
     if AA.Shell then pcall(AA.Shell.Refresh) end
+  elseif cmd == "center" or cmd == "centre" then
+    if AA.UI and AA.UI.CenterWindow then AA.UI.CenterWindow() end
+    AA:Print("Window moved to the middle of the screen. Drag the title bar or any empty part of it to move it.")
   elseif cmd == "minimap" then
     if AA.Minimap then AA.Minimap.Toggle() end
   elseif cmd == "bagcheck" then
@@ -439,7 +444,13 @@ function AA:RunDiagnostics(verbose)
     local okC, n, t = pcall(AA.Crates.Inventory.Coverage, AA.Crates.Inventory)
     local okS, scan, why = pcall(AA.Crates.Scan.Capabilities, AA.Crates.Scan)
     d.crates = { verified = okC and n or nil, recipes = okC and t or nil, scanReady = okS and scan or false, scanReason = okS and why or nil,
-      tooltipHook = AA.Crates.Tooltip.installed or false }
+      tooltipHook = AA.Crates.Tooltip.installed or false, locale = GetLocale and GetLocale() or nil, reasons = {}, rendered = {} }
+    for id, crate in pairs(AA.Crates.Catalog.entries) do
+      if not AA.Crates.verified[id] then
+        d.crates.reasons[id] = crate.validation or "not checked yet"
+        if AA.Crates.renderedTooltip and AA.Crates.renderedTooltip[id] then d.crates.rendered[id] = AA.Crates.renderedTooltip[id] end
+      end
+    end
   end
   if AA.Questie then
     local db, why = AA.Questie.DB()
