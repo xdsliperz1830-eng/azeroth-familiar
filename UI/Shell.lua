@@ -195,17 +195,17 @@ function Sh.ApplyLayout()
   Sh.LayoutNav()
 end
 
--- Menu rows share the menu's height: 28 px each on a short window, up to 44 px with
--- bigger icons and text on a tall one, so the menu has no empty lower half.
+-- Menu rows share the menu's height: 28 px each on a short window, up to 36 px with
+-- slightly bigger icons on a tall one, so the menu has no empty lower half.
 function Sh.LayoutNav()
   if not nav or not navButtons then return end
   local n = #Sh.order
   if n == 0 then return end
   local compact = settings().compactNav and true or false
   local h = tonumber(nav:GetHeight()) or 0
-  local bh = math.max(28, math.min(44, math.floor((h - 12) / n) - 2))
-  local big = bh >= 36
-  local icon = compact and math.min(26, bh - 6) or math.min(32, bh - 6)
+  local bh = math.max(28, math.min(36, math.floor((h - 12) / n) - 2))
+  local big = false                       -- keep the regular menu font
+  local icon = math.min(26, bh - 6)
   local y = -6
   for _, def in ipairs(Sh.order) do
     local b = navButtons[def.id]

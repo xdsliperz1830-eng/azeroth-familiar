@@ -65,22 +65,22 @@ local page, short = nil, {}
 -- Card grid: fills the page. Two columns, or three once each card can be at least
 -- CARD_MIN wide. The rows share the visible height (cards from CARD_H up to CARD_MAX_H
 -- tall), with bigger icons and text on tall cards, and the value wraps onto more lines
--- instead of being cut off. Shortcuts sit right under the last row of cards.
-local CARD_MIN, CARD_H, CARD_MAX_H, CARD_GAP, ROW_GAP = 230, 46, 120, 8, 6
+-- (two lines at most) instead of being cut off. Shortcuts sit right under the cards.
+local CARD_MIN, CARD_H, CARD_MAX_H, CARD_GAP, ROW_GAP = 230, 46, 84, 8, 6
 local SHORTCUTS_H = 24 + 28 + 19 + 16      -- header, buttons, note and bottom margin
 local lastW, lastH
 
 -- Icon, fonts and text lines for a card of height ch.
 local function styleCard(f, ch)
-  local big = ch >= 72
-  local s = math.max(30, math.min(56, ch - 18))
+  local big = ch >= 80
+  local s = math.max(30, math.min(44, ch - 20))
   f.icon:SetSize(s, s)
   f.icon:ClearAllPoints(); f.icon:SetPoint("LEFT", 8 + (big and 4 or 0), 0)
   local x = 8 + (big and 4 or 0) + s + 10
   f.title:SetFontObject(big and GameFontNormal or GameFontNormalSmall)
-  f.value:SetFontObject(big and GameFontHighlightLarge or GameFontHighlight)
-  local titleH, lineH = big and 14 or 11, big and 19 or 14
-  local lines = math.max(1, math.min(3, math.floor((ch - titleH - 16) / lineH)))
+  f.value:SetFontObject(GameFontHighlight)                -- value text stays normal size
+  local titleH, lineH = big and 14 or 11, 14
+  local lines = math.max(1, math.min(2, math.floor((ch - titleH - 16) / lineH)))
   local top = math.max(5, math.floor((ch - (titleH + 4 + lines * lineH)) / 2))
   f.title:ClearAllPoints(); f.title:SetPoint("TOPLEFT", x, -top)
   f.value:ClearAllPoints(); f.value:SetPoint("TOPLEFT", x, -(top + titleH + 4))
