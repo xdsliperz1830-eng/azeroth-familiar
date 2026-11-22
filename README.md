@@ -1,30 +1,94 @@
 # Azeroth Familiar
 
+**Your all-in-one sidekick for World of Warcraft: Forever.** One window for everything you reach for every session: graphics presets, XP per hour, a "what do I drop?" helper for full bags, a Waylaid Crate planner with live auction prices, and an assistant that answers item and quest questions in plain English.
+
 *Formerly Azeroth Assistant.* The addon folder is still `AzerothAssistant`, so saved settings, the minimap button position and the desktop companion keep working after the rename.
 
-**Version 0.7.0** turns Azeroth Familiar into an everyday toolkit for WoW Forever. The assistant is still here, as one page.
+[Download on CurseForge](CURSEFORGE_LINK) · [Report a bug](https://github.com/xdsliperz1830-eng/azeroth-familiar/issues) · MIT licensed
+
+<!-- MEDIA SLOTS: each "🎬" line marks a spot for a GIF or video. To fill one: record it,
+     save it in screenshots/ under the suggested name, delete the "> 🎬" line and remove the
+     comment marks around the image line below it. Keep GIFs under ~10 MB (GitHub's limit)
+     and around 800 px wide. -->
+
+> 🎬 **Video slot: 30-second tour** (open the window, flip through the pages). Upload to YouTube and put the link here.
+<!-- [![Watch the 30-second tour](screenshots/overview.png)](YOUTUBE_LINK) -->
+
+![Overview page](screenshots/overview.png)
+
+## Highlights
+
+### Bags full? Know what to drop
+When you loot with full bags, the cheapest stack in your bags gets a pulsing red **DROP** label, the bags open so you can see it, and its tooltip says what it's worth. "Cheapest" uses the vendor price, or the **Auctionator** price when that is higher, so ore and herbs that sell well aren't picked. Quest items, your hearthstone and profession tools (skinning knife, mining pick, fishing pole) are never picked. Works with the default bags and **Bagnon**. It only points; it never sells or deletes anything.
+
+> 🎬 **GIF slot: DROP mark** (bags full → loot a mob → bags open, red DROP bounces → hover the item). Save as `screenshots/drop.gif`.
+<!-- ![DROP mark when looting with full bags](screenshots/drop.gif) -->
+
+### Waylaid Crates: the cheapest way to fill each crate
+The **Crates** page lists your crates (**My Crates**), every known recipe (**All Crates**) and the cost of buying an empty crate and filling it (**Buy & Fill**). Each accepted bundle is priced from the materials you own plus a manual **Auction House scan** (or Auctionator's cached prices), so you see the cash needed per crate. Hovering a crate highlights its cheapest bundle in green right in the tooltip (amber for cached estimates). It never buys or opens anything. Details in [docs/CRATES.md](docs/CRATES.md).
+
+> 🎬 **GIF slot: Crates page** (open the AH → Scan Auction House → expand a crate row → hover a crate to show the green line). Save as `screenshots/crates.gif`.
+<!-- ![Crates page and tooltip highlight](screenshots/crates.gif) -->
+
+### One-click graphics presets, with undo
+Five presets (**Default, Low, Balanced, High, Immersive**), three extras (**sharper image**, **more grass further away**, **stronger weather**) and the game's quality sliders with – / + buttons. Each slider learns this client's real maximum. Your original settings are remembered and one button puts them all back.
+
+> 🎬 **GIF slot: Graphics presets** (click Low, then Immersive; the world changes behind the window). Save as `screenshots/graphics.gif`.
+<!-- ![Graphics presets](screenshots/graphics.gif) -->
+
+### Ask in plain English
+- "is this an upgrade?" with an item link: stat differences against what you're wearing
+- "which is better for me?" with two item links: a side-by-side comparison
+- "where can I get [item]?": vendors, drops and quest rewards with coordinates (uses **Questie**)
+- a quest link plus "where do I go?": objectives, progress, quest giver and turn-in
+- its own **Assistant chat tab**, which never posts to public chat
+
+Every answer says where it came from. Answers with web sources come from the optional **Azeroth Companion** desktop app, which is separate from the addon.
+
+> 🎬 **GIF slot: Assistant** (type "where can I get Linen Cloth?" and the answer appears). Save as `screenshots/assistant.gif`.
+<!-- ![Asking the assistant](screenshots/assistant.gif) -->
+
+### Character and session
+XP and time to next level, **XP per hour**, rested bonus, gold earned / spent / net this session, and durability per item. The Overview card shows your health and mana in colour and a portrait matching your race and gender.
+
+![Character page](screenshots/character.png)
+
+### Also included
+- **World:** coordinates, saved places, and a map pin where the game supports it
+- **Gameplay:** the game's own convenience options in one place (auto-loot, instant quest text, nameplates, camera distance, UI scale…)
+- **Performance:** frame rate, latency, plain-language tips and an optional on-screen FPS readout
+- **Reminders:** optional chat notes for low durability, nearly full bags, vendor greys and repair cost, and a level-up summary
+- **A proper frame:** gold and gem border around the window and its dialogs
+
+![Graphics page](screenshots/graphics.png)
+![Gameplay page](screenshots/gameplay.png)
 
 ## Pages
 | Page | What it does |
 |---|---|
 | Overview | Cards for character, location, health/mana, gold, durability, bag space, performance and addon status, plus shortcuts. |
-| Graphics | Five presets (Default, Low, Balanced, High, Immersive), the three enhancements (sharper image, more grass, stronger weather) and the game's quality sliders. Remembers your earlier values; one button restores them. |
+| Graphics | Five presets, three enhancements and the game's quality sliders (each learns this client's real maximum). Remembers your earlier values; one button restores them. |
 | Performance | Frame rate, average, latency, session length, plain advice, optional on-screen readout, addon memory on request. |
 | Character | Experience and rested bonus, session experience and gold, durability by item, target summary. |
-| Bags | Free slots, gold, grey items with vendor value, bag search. When you loot with full bags, the stack worth the least (vendor price, or Auctionator's auction price when that is higher) is marked in the bags (default frames and Bagnon) with a pulsing glow, red tint and a "DROP" label, and is named in chat; closed bags open for it and close with the loot window. Profession and class tools (skinning knife, mining pick, fishing pole...) are never picked. Never sells or deletes anything. |
-| Crates | Waylaid Crate planner (formerly the Crate Scout addon). My Crates, All Crates and Buy & Fill compare the cash needed to fill one crate with each valid bundle, using owned materials and a manual Auction House scan, and to buy an empty crate and fill it. Crate tooltips get a short summary and the cheapest bundle line turns green (amber for cached estimates). See `docs/CRATES.md`. Never buys or opens anything. |
+| Bags | Free slots, gold, grey items with vendor value, bag search, and the DROP mark when looting with full bags (default bags and Bagnon; Auctionator prices count). Never sells or deletes anything. |
+| Crates | Waylaid Crate planner (formerly the Crate Scout addon): My Crates, All Crates and Buy & Fill, priced from owned materials and a manual Auction House scan, plus tooltip highlighting of the cheapest bundle. See `docs/CRATES.md`. Never buys or opens anything. |
 | World | Zone and coordinates, saved places, map pin (when the client supports it), copy box. |
 | Gameplay | The game's own convenience options: auto-loot, instant quest text, nameplates, camera distance, UI scale and more. |
 | Interface | Window size, opacity, compact navigation, start page, Overview cards, chat reminders, resets. |
-| Assistant | The original item/quest/bag assistant, with the optional desktop companion. |
+| Assistant | The item/quest/bag assistant, with the optional desktop companion. |
 
 Commands: `/fam` (open), `/fam graphics`, `/fam perf`, `/fam character`, `/fam bags`, `/fam crates` (also `/fam crates verify`, `/fam crates cancel`, and the old `/cratescout`), `/fam world`, `/fam gameplay`, `/fam interface`, `/fam assistant`, `/fam pin <name>`, `/fam fps`, `/fam diag`, `/fam help`. `/familiar` and the old `/aa` work the same way.
+
+## Works with (all optional)
+- **Questie:** vendor, drop, NPC and quest-location answers
+- **Auctionator:** auction prices for the DROP mark and cached crate prices
+- **Bagnon:** the DROP mark shows in Bagnon's bags
 
 ## What it will not do
 No selling, buying, repairing, looting, targeting, casting or message sending. Game settings change only when you click, never in combat, and each change is read back from the game. Health and mana are hidden from addons during combat on this client, so there are no low-health reminders.
 
 ## Status
-Tested in a simulated client only. In the real game, only the earlier assistant features and the three graphics enhancements have been seen working. Game setting names were checked against this install's `Config.wtf`; the upper limits of the quality sliders and all Gameplay options are checked at run time (missing ones are greyed out). See `TESTING.md`.
+Tested in a simulated client and partly in the real game. Game setting names were checked against this install's `Config.wtf`; the upper limits of the quality sliders and all Gameplay options are checked at run time (missing ones are greyed out). See `TESTING.md`.
 
 ## Files
 `Core.lua` (namespace, saved data, events, slash commands, diagnostics), `Tweaks.lua` (game-settings engine), `Modules/Stats.lua` (read-only facts and session tracking), `Modules/Reminders.lua`, `Modules/BagHint.lua` (what-to-drop mark when looting with full bags), `Crates/` (crate recipes, tooltip validation, AH scanner, cost engine and tooltip highlight; page in `Modules/Crates.lua`), `UI/Widgets.lua` (shared controls), `UI/Shell.lua` (navigation and page host), `UI.lua` (window and Assistant page), one file per page in `Modules/`, and the assistant files (`Assistant.lua`, `Search.lua`, `Compare.lua`, `Quests.lua`, `Context.lua`, `Links.lua`, `Export.lua`, `Companion.lua`, `ChatTab.lua`, `Integrations/`).
