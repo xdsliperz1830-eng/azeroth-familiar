@@ -62,9 +62,33 @@ O.CARDS = {
 local cards = {}
 local page, short = nil, {}
 
--- Card grid: fills the page width. Two columns, or three once each card can be at
--- least CARD_MIN wide. Shortcuts sit right under the last row of cards.
-local CARD_MIN, CARD_H, CARD_GAP, ROW_PITCH = 230, 46, 8, 52
+-- Card grid: fills the page. Two columns, or three once each card can be at least
+-- CARD_MIN wide. The rows share the visible height (cards from CARD_H up to CARD_MAX_H
+-- tall), with bigger icons and text on tall cards, and the value wraps onto more lines
+-- instead of being cut off. Shortcuts sit right under the last row of cards.
+local CARD_MIN, CARD_H, CARD_MAX_H, CARD_GAP, ROW_GAP = 230, 46, 120, 8, 6
+local SHORTCUTS_H = 24 + 28 + 19 + 16      -- header, buttons, note and bottom margin
+local lastW, lastH
+
+-- Icon, fonts and text lines for a card of height ch.
+local function styleCard(f, ch)
+  local big = ch >= 72
+  local s = math.max(30, math.min(56, ch - 18))
+  f.icon:SetSize(s, s)
+  f.icon:ClearAllPoints(); f.icon:SetPoint("LEFT", 8 + (big and 4 or 0), 0)
+  local x = 8 + (big and 4 or 0) + s + 10
+  f.title:SetFontObject(big and GameFontNormal or GameFontNormalSmall)
+  f.value:SetFontObject(big and GameFontHighlightLarge or GameFontHighlight)
+  local titleH, lineH = big and 14 or 11, big and 19 or 14
+  local lines = math.max(1, math.min(3, math.floor((ch - titleH - 16) / lineH)))
+  local top = math.max(5, math.floor((ch - (titleH + 4 + lines * lineH)) / 2))
+  f.title:ClearAllPoints(); f.title:SetPoint("TOPLEFT", x, -top)
+  f.value:ClearAllPoints(); f.value:SetPoint("TOPLEFT", x, -(top + titleH + 4))
+  f.value:SetPoint("RIGHT", f, "RIGHT", -8, 0)
+  f.value:SetJustifyV("TOP")
+  if f.value.SetWordWrap then f.value:SetWordWrap(lines > 1) end
+  if f.value.SetMaxLines then f.value:SetMaxLines(lines) end
+end
 local SHORTCUTS = {
   { "Graphics", 84, function() AA.Shell.Show("graphics") end, "Graphics", "Presets and individual graphics settings." },
   { "Bags", 64, function() AA.Shell.Show("inventory") end, "Bags", "Bag space, grey items and bag search." },
@@ -75,23 +99,36 @@ local SHORTCUTS = {
   { "Ask the assistant", 130, function() AA.Shell.Show("assistant") end, "Assistant", "Ask about items, quests and your bags." },
 }
 
-local function layout(width)
+local function layout(width, height)
   if not page then return end
-  width = tonumber(width) or tonumber(page:GetWidth()) or 480
+  width = tonumber(width) or lastW or tonumber(page:GetWidth()) or 480
+  height = tonumber(height) or lastH
+  lastW, lastH = width, height
   local avail = math.max(CARD_MIN, width - 20)
   local cols = (avail >= 3 * CARD_MIN + 2 * CARD_GAP) and 3 or 2
   local cw = math.floor((avail - (cols - 1) * CARD_GAP) / cols)
   local top = O.top or -32
+  local count = 0
+  for _, c in ipairs(cards) do if c.frame:IsShown() then count = count + 1 end end
+  local rows = math.max(1, math.ceil(count / cols))
+  -- share the visible height between the rows of cards
+  local ch = CARD_H
+  if height then
+    local room = height + top - SHORTCUTS_H - 4 - (rows - 1) * ROW_GAP
+    ch = math.max(CARD_H, math.min(CARD_MAX_H, math.floor(room / rows)))
+  end
+  local pitch = ch + ROW_GAP
   local shown = 0
   for _, c in ipairs(cards) do
     if c.frame:IsShown() then
       c.frame:ClearAllPoints()
-      c.frame:SetSize(cw, CARD_H)
-      c.frame:SetPoint("TOPLEFT", 10 + (shown % cols) * (cw + CARD_GAP), top - math.floor(shown / cols) * ROW_PITCH)
+      c.frame:SetSize(cw, ch)
+      c.frame:SetPoint("TOPLEFT", 10 + (shown % cols) * (cw + CARD_GAP), top - math.floor(shown / cols) * pitch)
+      if c.styled ~= ch then styleCard(c.frame, ch); c.styled = ch end
       shown = shown + 1
     end
   end
-  local y = top - math.ceil(shown / cols) * ROW_PITCH - 4
+  local y = top - rows * pitch - 4
   -- "Shortcuts" header, same look as L:Header
   short.head:ClearAllPoints(); short.head:SetPoint("TOPLEFT", 10, y - 2)
   short.line:ClearAllPoints(); short.line:SetPoint("TOPLEFT", 10, y - 19)
@@ -165,5 +202,5 @@ AA.Shell.Register({
   id = "overview", title = "Overview", order = 10, icon = I .. "INV_Misc_Book_09",
   subtitle = "Your character at a glance.",
   build = build, refresh = refresh, interval = 1,
-  resize = function(_, width) layout(width) end,
+  resize = function(_, width, height) layout(width, height) end,
 })

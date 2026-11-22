@@ -286,6 +286,7 @@ function W.Card(parent, icon, title, w, h)
   if v.SetWordWrap then v:SetWordWrap(false) end
   c.value = v
   c.icon = ic
+  c.title = t
   return c
 end
 

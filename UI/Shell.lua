@@ -110,6 +110,7 @@ function Sh.Relayout(now)
     end
     relayoutQueued = false
   end
+  pcall(Sh.LayoutNav)
   local def = current and Sh.defs[current]
   local st = def and state[def.id]
   if not st or not st.built or st.broken then return end
@@ -191,6 +192,33 @@ function Sh.ApplyLayout()
     b:SetWidth(w - 2)
     if compact then b.text:Hide() else b.text:Show() end
   end
+  Sh.LayoutNav()
+end
+
+-- Menu rows share the menu's height: 28 px each on a short window, up to 44 px with
+-- bigger icons and text on a tall one, so the menu has no empty lower half.
+function Sh.LayoutNav()
+  if not nav or not navButtons then return end
+  local n = #Sh.order
+  if n == 0 then return end
+  local compact = settings().compactNav and true or false
+  local h = tonumber(nav:GetHeight()) or 0
+  local bh = math.max(28, math.min(44, math.floor((h - 12) / n) - 2))
+  local big = bh >= 36
+  local icon = compact and math.min(26, bh - 6) or math.min(32, bh - 6)
+  local y = -6
+  for _, def in ipairs(Sh.order) do
+    local b = navButtons[def.id]
+    if b then
+      b:SetHeight(bh)
+      b:ClearAllPoints(); b:SetPoint("TOPLEFT", 1, y)
+      if b.icon then b.icon:SetSize(icon, icon) end
+      b.text:SetFontObject(big and GameFontNormal or GameFontNormalSmall)
+      b.text:ClearAllPoints(); b.text:SetPoint("LEFT", 6 + icon + 8, 0)
+      y = y - bh - 2
+    end
+  end
+  paintNav()
 end
 
 -- Called once by UI.lua when the window is created.
@@ -233,6 +261,7 @@ function Sh.Attach(frame, mode)
     end
     local ic = W.Icon(b, icon, 22)
     ic:SetPoint("LEFT", 6, 0)
+    b.icon = ic
     b.text = W.Text(b, def.title, "GameFontNormalSmall")
     b.text:SetPoint("LEFT", 34, 0)
     local id = def.id
