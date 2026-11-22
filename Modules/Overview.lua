@@ -203,4 +203,5 @@ AA.Shell.Register({
   subtitle = "Your character at a glance.",
   build = build, refresh = refresh, interval = 1,
   resize = function(_, width, height) layout(width, height) end,
+  zoom = false,          -- sizes its own cards to the window instead of zooming
 })

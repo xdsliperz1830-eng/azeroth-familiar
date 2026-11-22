@@ -100,6 +100,21 @@ end
 -- def.resize(L, width, height) if it has one. While the window is being dragged this runs
 -- at most ten times a second; Sh.Relayout(true) runs it right away (when the drag ends).
 local relayoutQueued = false
+
+-- Page zoom: on a window bigger than the default, a page scales up evenly (text, icons,
+-- rows, buttons), from 100% at the default page area (about ZOOM_W x ZOOM_H) up to
+-- ZOOM_MAX, in 5% steps so dragging doesn't jitter. The page is then laid out again in
+-- its zoomed size, so it still fills the width. Pages with def.zoom == false (Overview,
+-- which sizes its own cards) stay at 100%.
+local ZOOM_W, ZOOM_H, ZOOM_MAX = 600, 430, 1.3
+local function pageZoom(def)
+  if def.zoom == false or not host then return 1 end
+  local w, h = tonumber(host:GetWidth()) or 0, tonumber(host:GetHeight()) or 0
+  if w <= 0 or h <= 0 then return 1 end
+  local z = math.min(w / ZOOM_W, h / ZOOM_H)
+  return math.max(1, math.min(ZOOM_MAX, math.floor(z * 20 + 0.5) / 20))
+end
+
 function Sh.Relayout(now)
   if not now then
     if relayoutQueued then return end
@@ -114,6 +129,12 @@ function Sh.Relayout(now)
   local def = current and Sh.defs[current]
   local st = def and state[def.id]
   if not st or not st.built or st.broken then return end
+  local z = pageZoom(def)
+  if st.zoom ~= z then
+    st.zoom = z
+    st.frame:SetScale(z)
+    Sh.Relayout()          -- measure again once the zoomed page has its new size
+  end
   local w = st.child and tonumber(st.child:GetWidth()) or tonumber(st.frame:GetWidth())
   local h = tonumber(st.frame:GetHeight())
   if not w or w < 50 then return end
