@@ -55,6 +55,7 @@ local function pageState(def)
   sf:SetPoint("TOPLEFT", 4, -4)
   sf:SetPoint("BOTTOMRIGHT", -4, 4)
   st.frame = sf
+  st.child = child
   st.layout = W.Layout(child)
   if ok then ok, err = pcall(def.build, st.layout, child) end
   if ok then
@@ -94,6 +95,37 @@ function Sh.Refresh()
   if def then refreshPage(def) end
 end
 
+-- Resizing: when the page area changes size, the current page lays itself out again for
+-- the new width and height: the layout's right-hand column (L:Column), then the page's own
+-- def.resize(L, width, height) if it has one. While the window is being dragged this runs
+-- at most ten times a second; Sh.Relayout(true) runs it right away (when the drag ends).
+local relayoutQueued = false
+function Sh.Relayout(now)
+  if not now then
+    if relayoutQueued then return end
+    relayoutQueued = true
+    if C_Timer and C_Timer.After then
+      C_Timer.After(0.1, function() relayoutQueued = false; Sh.Relayout(true) end)
+      return
+    end
+    relayoutQueued = false
+  end
+  local def = current and Sh.defs[current]
+  local st = def and state[def.id]
+  if not st or not st.built or st.broken then return end
+  local w = st.child and tonumber(st.child:GetWidth()) or tonumber(st.frame:GetWidth())
+  local h = tonumber(st.frame:GetHeight())
+  if not w or w < 50 then return end
+  local ok, err = pcall(function()
+    if st.layout and st.layout.Reflow then st.layout:Reflow(w) end
+    if def.resize then def.resize(st.layout, w, h) end
+  end)
+  if not ok then
+    AA.pageErrors = AA.pageErrors or {}
+    AA.pageErrors[def.id] = tostring(err)
+  end
+end
+
 local function paintNav()
   for id, b in pairs(navButtons or {}) do
     local on = (id == current)
@@ -116,6 +148,8 @@ function Sh.Show(id)
   if modeText then modeText:SetText(def.subtitle or "") end
   paintNav()
   refreshPage(def)
+  Sh.Relayout(true)
+  Sh.Relayout()          -- again once a first-time page has its size
   if def.onShow then pcall(def.onShow) end
 end
 
@@ -176,6 +210,7 @@ function Sh.Attach(frame, mode)
   edge:SetPoint("TOPRIGHT"); edge:SetPoint("BOTTOMRIGHT")
 
   host = CreateFrame("Frame", nil, frame)
+  host:SetScript("OnSizeChanged", function() Sh.Relayout() end)
   navButtons = {}
   local y = -6
   for _, def in ipairs(Sh.order) do

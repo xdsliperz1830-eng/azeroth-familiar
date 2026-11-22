@@ -74,27 +74,29 @@ end
 local function row(p, i)
   local r = rows[i]
   if r then return r end
+  -- The row spans the page width (anchored in refresh); the buttons sit at its right end
+  -- and the name and coordinates use everything to their left.
   r = { frame = CreateFrame("Frame", nil, p) }
-  r.frame:SetSize(470, 24)
-  r.text = W.Text(r.frame, "", "GameFontHighlightSmall")
-  r.text:SetPoint("LEFT", 4, 0)
-  r.text:SetWidth(280)
-  if r.text.SetWordWrap then r.text:SetWordWrap(false) end
-  r.pin = W.Button(r.frame, "Pin", 44, function()
-    local loc = list()[i]
-    if loc then local ok, msg = Wd.Pin(loc); AA.Shell.Flash(msg, ok) end
-  end, "Pin on the map", "Sets the game's map pin on this place.")
-  r.pin:SetPoint("LEFT", 290, 0)
-  r.copy = W.Button(r.frame, "Copy", 50, function()
-    local loc = list()[i]
-    if loc then AA.UI.ShowCopy("Saved place", "Press Ctrl+C to copy.", Wd.Text(loc)) end
-  end, "Copy", "Opens a box with the zone and coordinates to copy.")
-  r.copy:SetPoint("LEFT", r.pin, "RIGHT", 4, 0)
+  r.frame:SetHeight(24)
   r.del = W.Button(r.frame, "Remove", 66, function()
     Wd.Remove(i)
     AA.Shell.Refresh()
   end)
-  r.del:SetPoint("LEFT", r.copy, "RIGHT", 4, 0)
+  r.del:SetPoint("RIGHT", 0, 0)
+  r.copy = W.Button(r.frame, "Copy", 50, function()
+    local loc = list()[i]
+    if loc then AA.UI.ShowCopy("Saved place", "Press Ctrl+C to copy.", Wd.Text(loc)) end
+  end, "Copy", "Opens a box with the zone and coordinates to copy.")
+  r.copy:SetPoint("RIGHT", r.del, "LEFT", -4, 0)
+  r.pin = W.Button(r.frame, "Pin", 44, function()
+    local loc = list()[i]
+    if loc then local ok, msg = Wd.Pin(loc); AA.Shell.Flash(msg, ok) end
+  end, "Pin on the map", "Sets the game's map pin on this place.")
+  r.pin:SetPoint("RIGHT", r.copy, "LEFT", -4, 0)
+  r.text = W.Text(r.frame, "", "GameFontHighlightSmall")
+  r.text:SetPoint("LEFT", 4, 0)
+  r.text:SetPoint("RIGHT", r.pin, "LEFT", -8, 0)
+  if r.text.SetWordWrap then r.text:SetWordWrap(false) end
   rows[i] = r
   return r
 end
@@ -148,6 +150,7 @@ local function refresh()
       local r = row(page, i)
       r.frame:ClearAllPoints()
       r.frame:SetPoint("TOPLEFT", 10, listTop - (i - 1) * 26)
+      r.frame:SetPoint("RIGHT", page, "RIGHT", -12, 0)
       r.text:SetText(W.GOLD .. loc.name .. "|r  " .. string.format("%s %.1f, %.1f", loc.zone or "?", loc.x, loc.y))
       if canPin then r.pin:Enable() else r.pin:Disable() end
       r.frame:Show()

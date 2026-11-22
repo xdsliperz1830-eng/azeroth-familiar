@@ -310,8 +310,27 @@ end
 
 -- Top-to-bottom layout helper for a page. All rows share the same spacing.
 function W.Layout(p)
-  local L = { y = -8, p = p, refreshers = {} }
+  local L = { y = -8, p = p, refreshers = {}, columns = {} }
   local function track(w) L.refreshers[#L.refreshers + 1] = w; return w end
+
+  -- Right-hand column: a control placed at the right edge of the page (16 px in), but
+  -- never left of minX, its old fixed spot. L:Reflow(width) moves the column when the
+  -- page gets wider or narrower (the page shell calls it on resize).
+  local function placeColumn(c, width)
+    local w = tonumber(c.widget:GetWidth()) or 150
+    local x = math.max(c.minX, math.floor((width or 0) - 16 - w))
+    c.widget:ClearAllPoints()
+    c.widget:SetPoint("TOPLEFT", p, "TOPLEFT", x, c.y)
+  end
+  function L:Column(widget, y, minX)
+    local c = { widget = widget, y = y, minX = minX or 220 }
+    self.columns[#self.columns + 1] = c
+    placeColumn(c, tonumber(p:GetWidth()))
+    return widget
+  end
+  function L:Reflow(width)
+    for _, c in ipairs(self.columns) do placeColumn(c, width) end
+  end
 
   function L:Row(h) local y = self.y; self.y = self.y - h; return y end
   function L:Space(h) self.y = self.y - (h or 8) end
@@ -362,7 +381,7 @@ function W.Layout(p)
     local l = W.Text(p, label)
     l:SetPoint("TOPLEFT", 14, y - 5)
     local s = W.Stepper(p, opts)
-    s:SetPoint("TOPLEFT", 220, y)
+    self:Column(s, y, 220)
     if tipTitle then W.Hover(p, 10, y, 200, 24, tipTitle, tipText) end
     return track(s)
   end

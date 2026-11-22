@@ -64,7 +64,7 @@ local function build(L, p)
       function() return S().startPage end,
       function(x) S().startPage = x end,
       "Open the window on", "Which page shows first when you open Azeroth Familiar. Click to change.")
-    c:SetPoint("TOPLEFT", 220, y)
+    L:Column(c, y, 220)                 -- right-hand column, follows the page width
     L:Track(c)
   end
 

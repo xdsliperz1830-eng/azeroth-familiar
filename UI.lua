@@ -620,7 +620,10 @@ local function create()
   grip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
   grip:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
   grip:SetScript("OnMouseDown", function() frame:StartSizing("BOTTOMRIGHT") end)
-  grip:SetScript("OnMouseUp", function() frame:StopMovingOrSizing(); savePosition() end)
+  grip:SetScript("OnMouseUp", function()
+    frame:StopMovingOrSizing(); savePosition()
+    if AA.Shell.Relayout then AA.Shell.Relayout(true) end   -- final layout at the new size
+  end)
 
   if type(UISpecialFrames) == "table" then tinsert(UISpecialFrames, "AzerothAssistantFrame") end
 

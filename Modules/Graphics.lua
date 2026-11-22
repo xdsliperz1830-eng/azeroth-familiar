@@ -68,7 +68,7 @@ function AA.SettingRows(L, p, list, out, showStatus)
         min = s.min, max = function() return T.Max(s) end, step = s.step or 1,
         fmt = function(v) return T.Format(s, v) end,
       })
-      st:SetPoint("TOPLEFT", 250, y)
+      L:Column(st, y, 250)              -- right-hand column, follows the page width
       L:Track(st)
       out[#out + 1] = { s = s, icon = icon }
     end
