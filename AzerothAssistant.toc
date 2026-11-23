@@ -2,7 +2,7 @@
 ## Title: Azeroth Familiar
 ## Notes: Everyday toolkit for WoW Forever: overview dashboard, graphics presets, performance, character, bags, Waylaid Crate planner, saved places, gameplay options, and an optional assistant for item and quest questions.
 ## Author: Trinchet
-## Version: 0.9.5
+## Version: 0.9.6
 ## SavedVariables: AzerothAssistantDB
 ## SavedVariablesPerCharacter: AzerothAssistantCharDB
 ## Category: Quests & Leveling

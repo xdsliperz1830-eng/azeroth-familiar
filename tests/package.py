@@ -11,7 +11,8 @@ assert f'AA.VERSION = "{version}"' in (root / 'Core.lua').read_text(encoding='ut
 modules = [l.strip().replace('\\', '/') for l in toc.splitlines() if l.strip() and not l.startswith('#')]
 for m in modules:
     assert (root / m).is_file(), f'Missing TOC module: {m}'
-ship = ['AzerothAssistant.toc', 'README.md', 'LICENSE', 'Media/Logo.tga'] + modules
+media = [p.relative_to(root).as_posix() for p in (root / 'Media').glob('*.tga')]
+ship = ['AzerothAssistant.toc', 'README.md', 'LICENSE'] + media + modules
 target = root.parent / 'releases' / f'AzerothFamiliar-{version}.zip'
 assert not target.exists(), f'{target} already exists; bump the version'
 with zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as archive:
