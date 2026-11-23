@@ -53,6 +53,7 @@ local DEFAULTS = {
     perfDisplay = false,    -- small on-screen FPS readout
     perfLatency = true,     -- include world latency in it
     lockWindow = false,     -- true: the window can't be dragged
+    border = "faction",     -- window border: "faction" (Horde red / Alliance blue), "gold" or "plain"
     -- Crates page (v0.9.0, formerly the Crate Scout addon)
     crates = { countOwned = false, tooltip = true },
   },

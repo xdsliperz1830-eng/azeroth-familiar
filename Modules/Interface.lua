@@ -20,6 +20,8 @@ function AA.ResetInterfaceSettings()
   s.remind = { durability = true, bags = true, cheapest = true, vendor = true, levelup = true }
   s.perfDisplay, s.perfLatency = false, true
   s.minimap.hide = false
+  s.border = "faction"
+  if AA.UI.ApplyBorder then pcall(AA.UI.ApplyBorder) end
   AA.db.frame = {}
   AA.db.perfFrame = nil
   if AA.Minimap then pcall(AA.Minimap.Refresh) end
@@ -65,6 +67,21 @@ local function build(L, p)
       function(x) S().startPage = x end,
       "Open the window on", "Which page shows first when you open Azeroth Familiar. Click to change.")
     L:Column(c, y, 220)                 -- right-hand column, follows the page width
+    L:Track(c)
+  end
+  do
+    local y = L:Row(28)
+    local l = W.Text(p, "Window border")
+    l:SetPoint("TOPLEFT", 14, y - 5)
+    local c = W.Choice(p, 150, { { "faction", "Faction colours" }, { "gold", "Gold" }, { "plain", "Plain line" } },
+      function() return S().border or "faction" end,
+      function(x)
+        S().border = x
+        if AA.UI.ApplyBorder then AA.UI.ApplyBorder() end
+        AA.Shell.Flash("Window border: " .. (x == "faction" and "faction colours" or x == "gold" and "gold" or "plain line"), true)
+      end,
+      "Window border", "Faction colours: a red Horde frame or a blue Alliance frame, matching your character. Gold: the gold and gem frame. Plain line: the original thin border, with the most room for the pages. Click to change.")
+    L:Column(c, y, 220)
     L:Track(c)
   end
 

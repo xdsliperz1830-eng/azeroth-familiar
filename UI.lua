@@ -25,19 +25,71 @@ local function addBackground(f, r, g, b, a)
   return t
 end
 
+-- The original plain border: a 1 px bronze line. Kept on f.plainBorder so it can be
+-- shown or hidden when the window border style changes.
 local function addBorder(f)
   local c = { 0.45, 0.36, 0.18, 1 } -- bronze, matches UI/Widgets.lua
+  local edges = {}
   local function edge(p1, p2, w, h)
     local t = f:CreateTexture(nil, "BORDER")
     t:SetColorTexture(unpack(c))
     t:SetPoint(p1); t:SetPoint(p2)
     if w then t:SetWidth(w) end
     if h then t:SetHeight(h) end
+    edges[#edges + 1] = t
   end
   edge("TOPLEFT", "TOPRIGHT", nil, 1)
   edge("BOTTOMLEFT", "BOTTOMRIGHT", nil, 1)
   edge("TOPLEFT", "BOTTOMLEFT", 1, nil)
   edge("TOPRIGHT", "BOTTOMRIGHT", 1, nil)
+  f.plainBorder = edges
+  return edges
+end
+
+-- Window border style ------------------------------------------------------------------
+-- Setting "border": "faction" (default: red Horde frame or blue Alliance frame, the gold
+-- frame for anyone else), "gold", or "plain" (the original 1 px line).
+function UI.BorderStyle()
+  local pick = AA.db and AA.db.settings and AA.db.settings.border or "faction"
+  if pick == "plain" or pick == "gold" then return pick end
+  local ok, faction = pcall(UnitFactionGroup, "player")
+  if ok and faction == "Horde" then return "horde" end
+  if ok and faction == "Alliance" then return "alliance" end
+  return "gold"
+end
+
+-- Every window with a border: { f, scale, outside, bg, onInsets(ins) }. ins is nil when the
+-- plain line is shown (by choice, or because the frame texture couldn't be used).
+local framed = {}
+local function frameWindow(e, style)
+  if AA.W.RemoveOrnateFrame then AA.W.RemoveOrnateFrame(e.f) end
+  local ins
+  if style ~= "plain" and AA.W.OrnateFrame then
+    ins = AA.W.OrnateFrame(e.f, e.scale, { style = style, outside = e.outside, bg = e.bg })
+  end
+  if not e.f.plainBorder then addBorder(e.f) end
+  for _, t in ipairs(e.f.plainBorder) do t:SetShown(not ins) end
+  if e.onInsets then e.onInsets(ins) end
+end
+
+local function addFramed(e)
+  framed[#framed + 1] = e
+  if not UI.borderStyle then UI.borderStyle = UI.BorderStyle() end
+  frameWindow(e, UI.borderStyle)
+end
+
+-- The faction is certain once the character is in the world: re-check then (a window
+-- built earlier may have used the gold fallback).
+AA:On("PLAYER_ENTERING_WORLD", function()
+  if #framed > 0 and UI.BorderStyle() ~= UI.borderStyle then UI.ApplyBorder() end
+end)
+
+-- Re-applies the border to every window (after the setting changes, or once the
+-- character's faction is known).
+function UI.ApplyBorder()
+  local style = UI.BorderStyle()
+  UI.borderStyle = style
+  for _, e in ipairs(framed) do frameWindow(e, style) end
 end
 
 local function makeButton(parent, text, width, onClick)
@@ -126,9 +178,7 @@ local function makeDialogFrame(name, w, h, title)
   d:SetClampedToScreen(true)
   addBackground(d, 0.04, 0.04, 0.06, 0.97)
   -- The small ornate frame goes around the outside, so nothing inside the box moves.
-  if not (AA.W.OrnateFrame and AA.W.OrnateFrame(d, UI.DIALOG_FRAME_SCALE, { outside = true, bg = { 0.04, 0.04, 0.06, 0.97 } })) then
-    addBorder(d)
-  end
+  addFramed({ f = d, scale = UI.DIALOG_FRAME_SCALE, outside = true, bg = { 0.04, 0.04, 0.06, 0.97 } })
   d:Hide()
   d.title = d:CreateFontString(nil, "OVERLAY", "GameFontNormal")
   d.title:SetPoint("TOPLEFT", 10, -8)
@@ -445,21 +495,14 @@ local function create()
   elseif frame.SetMinResize then frame:SetMinResize(MIN_W, MIN_H) end
   frame:EnableMouse(true)
   UI.bg = addBackground(frame, 0.05, 0.05, 0.07, 0.92)
-  -- Ornate gold frame (UI/Widgets.lua); the plain bronze line if its texture can't be used.
-  -- ins = how far the bands reach inside; curl = how far the corner curls reach past them.
-  local ins = AA.W.OrnateFrame and AA.W.OrnateFrame(frame, UI.FRAME_SCALE)
-  if not ins then
-    addBorder(frame)
-    ins = { l = 1, t = 1, r = 1, b = 1, curl = 0 }
-  end
-  frame.aaInsets = ins
+  -- The border (faction, gold or plain) is applied at the end of create(), once the title
+  -- bar and grip exist. Until then the window has the plain border's 1 px insets.
+  frame.aaInsets = { l = 1, t = 1, r = 1, b = 1, curl = 0 }
   restorePosition()
   frame:Hide()
 
-  -- Title bar (drag to move), just inside the top band
+  -- Title bar (drag to move), just inside the top band (placed by placeChrome below)
   local bar = CreateFrame("Frame", nil, frame)
-  bar:SetPoint("TOPLEFT", ins.l, -ins.t)
-  bar:SetPoint("TOPRIGHT", -ins.r, -ins.t)
   bar:SetHeight(24)
   addBackground(bar, 0.10, 0.08, 0.06, 1)
   -- Moving: drag the title bar, the gold frame, or any empty part of the window (buttons,
@@ -490,11 +533,8 @@ local function create()
   end)
   bar:SetScript("OnLeave", function() GameTooltip:Hide() end)
   local title = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  title:SetPoint("LEFT", 8 + ins.curl, 0)          -- clear of the corner curl
   title:SetText("Azeroth Familiar")
   local mode = bar:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-  mode:SetPoint("LEFT", title, "RIGHT", 8, 0)
-  mode:SetPoint("RIGHT", bar, "RIGHT", -30 - ins.curl, 0)
   mode:SetJustifyH("LEFT")
   if mode.SetWordWrap then mode:SetWordWrap(false) end
   mode:SetText("")
@@ -504,7 +544,6 @@ local function create()
     local fs = close:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     fs:SetPoint("CENTER"); fs:SetText("x")
   end
-  close:SetPoint("RIGHT", -ins.curl, 0)
   close:SetScript("OnClick", function() frame:Hide() end)
 
   -- Navigation + page host (UI/Shell.lua). The assistant chat below is one of the pages.
@@ -580,15 +619,19 @@ local function create()
   -- Settings overlay sits on top of the conversation area
   UI.settings = buildSettings(chat)
   UI.settings:SetFrameLevel(msg:GetFrameLevel() + 5)
-  -- Inset by the small frame's reach, so the frame drawn around it stays over the
-  -- conversation area and never covers the toolbar or the input box.
-  local reach = AA.W.OrnateFrame and AA.W.OrnateReach(UI.PANEL_FRAME_SCALE) or 0
-  if reach > 0 and AA.W.OrnateFrame(UI.settings, UI.PANEL_FRAME_SCALE, { outside = true, bg = { 0.06, 0.06, 0.09, 0.98 } }) then
-    UI.settings:SetPoint("TOPLEFT", msg, "TOPLEFT", reach, -reach)
-    UI.settings:SetPoint("BOTTOMRIGHT", msg, "BOTTOMRIGHT", -reach, reach)
-  else
-    UI.settings:SetAllPoints(msg)
-  end
+  -- With a frame, it is inset by the small frame's reach, so the frame drawn around it stays
+  -- over the conversation area and never covers the toolbar or the input box.
+  addFramed({ f = UI.settings, scale = UI.PANEL_FRAME_SCALE, outside = true, bg = { 0.06, 0.06, 0.09, 0.98 },
+    onInsets = function(ins)
+      UI.settings:ClearAllPoints()
+      if ins then
+        local reach = AA.W.OrnateReach(UI.PANEL_FRAME_SCALE, UI.borderStyle)
+        UI.settings:SetPoint("TOPLEFT", msg, "TOPLEFT", reach, -reach)
+        UI.settings:SetPoint("BOTTOMRIGHT", msg, "BOTTOMRIGHT", -reach, reach)
+      else
+        UI.settings:SetAllPoints(msg)
+      end
+    end })
 
   -- Input
   local input = makeInput(chat)
@@ -613,8 +656,6 @@ local function create()
   -- Resize grip
   local grip = CreateFrame("Button", nil, frame)
   grip:SetSize(16, 16)
-  -- in the strip above the bottom band, left of the corner curl
-  grip:SetPoint("BOTTOMRIGHT", -(ins.r + ins.curl + 2), ins.b + 2)
   grip:SetFrameLevel(frame:GetFrameLevel() + 40)   -- above the frame's ornaments
   grip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
   grip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
@@ -626,6 +667,26 @@ local function create()
   end)
 
   if type(UISpecialFrames) == "table" then tinsert(UISpecialFrames, "AzerothAssistantFrame") end
+
+  -- Border and everything that has to clear it: the title bar sits just inside the top band,
+  -- the title and close button clear the corners, the grip sits above the bottom band left
+  -- of the corner, and the menu and pages (UI/Shell.lua) sit inside the bands.
+  local function placeChrome(ins)
+    ins = ins or { l = 1, t = 1, r = 1, b = 1, curl = 0 }
+    frame.aaInsets = ins
+    bar:ClearAllPoints()
+    bar:SetPoint("TOPLEFT", ins.l, -ins.t)
+    bar:SetPoint("TOPRIGHT", -ins.r, -ins.t)
+    title:ClearAllPoints(); title:SetPoint("LEFT", 8 + ins.curl, 0)
+    mode:ClearAllPoints()
+    mode:SetPoint("LEFT", title, "RIGHT", 8, 0)
+    mode:SetPoint("RIGHT", bar, "RIGHT", -30 - ins.curl, 0)
+    close:ClearAllPoints(); close:SetPoint("RIGHT", -ins.curl, 0)
+    grip:ClearAllPoints(); grip:SetPoint("BOTTOMRIGHT", -(ins.r + ins.curl + 2), ins.b + 2)
+    AA.Shell.ApplyLayout()
+    if AA.Shell.Relayout then AA.Shell.Relayout() end
+  end
+  addFramed({ f = frame, scale = UI.FRAME_SCALE, onInsets = placeChrome })
 
   UI.ApplySettings()
   UI.RefreshPending()

@@ -203,6 +203,12 @@ function Sh.ApplyLayout()
   if not nav then return end
   local compact = settings().compactNav and true or false
   local w = compact and NAV_COMPACT or NAV_W
+  -- inside the left, top (below the 24 px title bar) and bottom bands of the current
+  -- border; 2 px clear of the side ornaments
+  local nins = frameInsets()
+  nav:ClearAllPoints()
+  nav:SetPoint("TOPLEFT", nins.l + 2, -(nins.t + 25))
+  nav:SetPoint("BOTTOMLEFT", nins.l + 2, nins.b)
   nav:SetWidth(w)
   host:ClearAllPoints()
   host:SetPoint("TOPLEFT", nav, "TOPRIGHT", 1, 0)
