@@ -54,6 +54,7 @@ local DEFAULTS = {
     perfLatency = true,     -- include world latency in it
     lockWindow = false,     -- true: the window can't be dragged
     border = "faction",     -- window border: "faction" (Horde red / Alliance blue), "gold" or "plain"
+    contentScale = 1,       -- "Content size": pages and menu, 0.8 to 1.5 (window size is separate)
     -- Crates page (v0.9.0, formerly the Crate Scout addon)
     crates = { countOwned = false, tooltip = true },
   },

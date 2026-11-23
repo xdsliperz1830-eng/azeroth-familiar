@@ -105,14 +105,25 @@ local relayoutQueued = false
 -- rows, buttons), from 100% at the default page area (about ZOOM_W x ZOOM_H) up to
 -- ZOOM_MAX, in 5% steps so dragging doesn't jitter. The page is then laid out again in
 -- its zoomed size, so it still fills the width. Pages with def.zoom == false (Overview,
--- which sizes its own cards) stay at 100%.
+-- which sizes its own cards) skip this automatic part.
+-- On top of that, the "Content size" setting (Interface page, 80% to 150%) scales every
+-- page and the menu, so text, icons and rows can be made bigger or smaller by hand.
 local ZOOM_W, ZOOM_H, ZOOM_MAX = 600, 430, 1.3
+local function contentScale()
+  local c = tonumber(settings().contentScale) or 1
+  return math.max(0.8, math.min(1.5, c))
+end
+Sh.ContentScale = contentScale
+
 local function pageZoom(def)
-  if def.zoom == false or not host then return 1 end
+  local user = contentScale()
+  if def.zoom == false or not host then return user end
   local w, h = tonumber(host:GetWidth()) or 0, tonumber(host:GetHeight()) or 0
-  if w <= 0 or h <= 0 then return 1 end
-  local z = math.min(w / ZOOM_W, h / ZOOM_H)
-  return math.max(1, math.min(ZOOM_MAX, math.floor(z * 20 + 0.5) / 20))
+  if w <= 0 or h <= 0 then return user end
+  -- the automatic part is measured in page units at the chosen content size
+  local z = math.min(w / user / ZOOM_W, h / user / ZOOM_H)
+  z = math.max(1, math.min(ZOOM_MAX, z))
+  return math.floor(z * user * 20 + 0.5) / 20
 end
 
 function Sh.Relayout(now)
@@ -206,9 +217,12 @@ function Sh.ApplyLayout()
   -- inside the left, top (below the 24 px title bar) and bottom bands of the current
   -- border; 2 px clear of the side ornaments
   local nins = frameInsets()
+  -- the menu follows "Content size" too; its offsets are in its own (scaled) units
+  local u = contentScale()
+  nav:SetScale(u)
   nav:ClearAllPoints()
-  nav:SetPoint("TOPLEFT", nins.l + 2, -(nins.t + 25))
-  nav:SetPoint("BOTTOMLEFT", nins.l + 2, nins.b)
+  nav:SetPoint("TOPLEFT", (nins.l + 2) / u, -(nins.t + 25) / u)
+  nav:SetPoint("BOTTOMLEFT", (nins.l + 2) / u, nins.b / u)
   nav:SetWidth(w)
   host:ClearAllPoints()
   host:SetPoint("TOPLEFT", nav, "TOPRIGHT", 1, 0)

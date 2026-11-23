@@ -21,6 +21,7 @@ function AA.ResetInterfaceSettings()
   s.perfDisplay, s.perfLatency = false, true
   s.minimap.hide = false
   s.border = "faction"
+  s.contentScale = 1
   if AA.UI.ApplyBorder then pcall(AA.UI.ApplyBorder) end
   AA.db.frame = {}
   AA.db.perfFrame = nil
@@ -37,6 +38,16 @@ local function build(L, p)
     set = function(x) S().windowScale = x; applied(string.format("Window size %d%%", x * 100)) end,
     min = 0.7, max = 1.3, step = 0.05, fmt = function(x) return string.format("%d%%", x * 100 + 0.5) end,
   }, "Window size", "Makes the whole Azeroth Familiar window bigger or smaller.")
+  L:Stepper("Content size", {
+    get = function() return S().contentScale or 1 end,
+    set = function(x)
+      S().contentScale = x
+      AA.Shell.ApplyLayout()
+      AA.Shell.Relayout(true)
+      AA.Shell.Flash(string.format("Content size %d%%", x * 100 + 0.5), true)
+    end,
+    min = 0.8, max = 1.5, step = 0.05, fmt = function(x) return string.format("%d%%", x * 100 + 0.5) end,
+  }, "Content size", "Makes the text, icons, rows and buttons inside the window bigger or smaller, without changing the window or its border. On a big window the pages also grow a little on their own.")
   L:Stepper("Background opacity", {
     get = function() return S().windowAlpha end,
     set = function(x) S().windowAlpha = x; applied("Background opacity " .. x .. "%") end,
