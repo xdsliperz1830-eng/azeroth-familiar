@@ -39,8 +39,7 @@ When you loot with full bags, the cheapest stack in your bags gets a pulsing red
 - **Tooltip highlight:** hover a crate and its cheapest bundle turns **green** (amber when it's only an estimate)
 - Never buys, opens or fills anything for you
 
-> 🎬 **GIF slot: Crates** (open the AH → Scan Auction House → expand a crate row → hover a crate to show the green line). File: `screenshots/crates.gif`
-<!-- ![Crates page and tooltip highlight](https://raw.githubusercontent.com/xdsliperz1830-eng/azeroth-familiar/main/screenshots/crates.gif) -->
+![Crates page and tooltip highlight](https://raw.githubusercontent.com/xdsliperz1830-eng/azeroth-familiar/main/screenshots/crates.gif)
 
 ## 🎨 One-click graphics presets, with undo
 - Five presets: **Default, Low, Balanced, High, Immersive**

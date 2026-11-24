@@ -26,8 +26,7 @@ When you loot with full bags, the cheapest stack in your bags gets a pulsing red
 ### Waylaid Crates: the cheapest way to fill each crate
 The **Crates** page lists your crates (**My Crates**), every known recipe (**All Crates**) and the cost of buying an empty crate and filling it (**Buy & Fill**). Each accepted bundle is priced from the materials you own plus a manual **Auction House scan** (or Auctionator's cached prices), so you see the cash needed per crate. Hovering a crate highlights its cheapest bundle in green right in the tooltip (amber for cached estimates). It never buys or opens anything. Details in [docs/CRATES.md](docs/CRATES.md).
 
-> 🎬 **GIF slot: Crates page** (open the AH → Scan Auction House → expand a crate row → hover a crate to show the green line). Save as `screenshots/crates.gif`.
-<!-- ![Crates page and tooltip highlight](screenshots/crates.gif) -->
+![Crates page and tooltip highlight](screenshots/crates.gif)
 
 ### One-click graphics presets, with undo
 Five presets (**Default, Low, Balanced, High, Immersive**), three extras (**sharper image**, **more grass further away**, **stronger weather**) and the game's quality sliders with – / + buttons. Each slider learns this client's real maximum. Your original settings are remembered and one button puts them all back.
