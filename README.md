@@ -21,8 +21,7 @@
 ### Bags full? Know what to drop
 When you loot with full bags, the cheapest stack in your bags gets a pulsing red **DROP** label, the bags open so you can see it, and its tooltip says what it's worth. "Cheapest" uses the vendor price, or the **Auctionator** price when that is higher, so ore and herbs that sell well aren't picked. Quest items, your hearthstone and profession tools (skinning knife, mining pick, fishing pole) are never picked. Works with the default bags and **Bagnon**. It only points; it never sells or deletes anything.
 
-> 🎬 **GIF slot: DROP mark** (bags full → loot a mob → bags open, red DROP bounces → hover the item). Save as `screenshots/drop.gif`.
-<!-- ![DROP mark when looting with full bags](screenshots/drop.gif) -->
+![DROP mark when looting with full bags](screenshots/drop.gif)
 
 ### Waylaid Crates: the cheapest way to fill each crate
 The **Crates** page lists your crates (**My Crates**), every known recipe (**All Crates**) and the cost of buying an empty crate and filling it (**Buy & Fill**). Each accepted bundle is priced from the materials you own plus a manual **Auction House scan** (or Auctionator's cached prices), so you see the cash needed per crate. Hovering a crate highlights its cheapest bundle in green right in the tooltip (amber for cached estimates). It never buys or opens anything. Details in [docs/CRATES.md](docs/CRATES.md).

@@ -29,8 +29,7 @@ When you loot with full bags, the cheapest stack in your bags gets a pulsing red
 - Works with the default bags and **Bagnon**
 - It only points: it never sells or deletes anything
 
-> 🎬 **GIF slot: DROP mark** (bags full → loot a mob → bags open, red DROP bounces → hover the item). File: `screenshots/drop.gif`
-<!-- ![DROP mark when looting with full bags](https://raw.githubusercontent.com/xdsliperz1830-eng/azeroth-familiar/main/screenshots/drop.gif) -->
+![DROP mark when looting with full bags](https://raw.githubusercontent.com/xdsliperz1830-eng/azeroth-familiar/main/screenshots/drop.gif)
 
 ## 📦 Waylaid Crates: the cheapest way to fill each crate
 - **My Crates:** the crates in your bags, with materials you already own counted. A crate you can fill right now shows **Ready to fill · 0c**
