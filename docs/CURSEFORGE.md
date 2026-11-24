@@ -47,8 +47,7 @@ When you loot with full bags, the cheapest stack in your bags gets a pulsing red
 - The game's quality sliders with simple – / + buttons; each learns this client's real maximum
 - Your original settings are remembered, and one button puts them all back
 
-> 🎬 **GIF slot: Graphics presets** (click Low, then Immersive; the world changes behind the window). File: `screenshots/graphics.gif`
-<!-- ![Graphics presets](https://raw.githubusercontent.com/xdsliperz1830-eng/azeroth-familiar/main/screenshots/graphics.gif) -->
+![Graphics presets](https://raw.githubusercontent.com/xdsliperz1830-eng/azeroth-familiar/main/screenshots/graphics.gif)
 
 ![Graphics page](https://raw.githubusercontent.com/xdsliperz1830-eng/azeroth-familiar/main/screenshots/graphics.png)
 

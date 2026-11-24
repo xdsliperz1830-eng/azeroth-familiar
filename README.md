@@ -31,8 +31,7 @@ The **Crates** page lists your crates (**My Crates**), every known recipe (**All
 ### One-click graphics presets, with undo
 Five presets (**Default, Low, Balanced, High, Immersive**), three extras (**sharper image**, **more grass further away**, **stronger weather**) and the game's quality sliders with – / + buttons. Each slider learns this client's real maximum. Your original settings are remembered and one button puts them all back.
 
-> 🎬 **GIF slot: Graphics presets** (click Low, then Immersive; the world changes behind the window). Save as `screenshots/graphics.gif`.
-<!-- ![Graphics presets](screenshots/graphics.gif) -->
+![Graphics presets](screenshots/graphics.gif)
 
 ### Ask in plain English
 - "is this an upgrade?" with an item link: stat differences against what you're wearing
